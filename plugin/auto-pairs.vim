@@ -1,7 +1,7 @@
 " Language:	JavaScript
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Last Change:  2011-05-22
-" Version: 1.0
+" Version: 1.0.1
 " Repository: https://github.com/jiangmiao/auto-pairs
 "
 " Insert or delete brackets, parens, quotes in pairs.
@@ -22,6 +22,9 @@ end
 if !exists('g:AutoPairs')
   let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"'}
 end
+
+let g:AutoPairsClosedPairs = {}
+
 
 
 function! AutoPairsInsert(key)
@@ -81,6 +84,17 @@ function! AutoPairsJump()
   call search('[{("\[\]'')}]','W')
 endfunction
 
+function! AutoPairsExtend()
+  let line = getline('.')
+  let current_char = line[col('.')-1]
+
+  if has_key(g:AutoPairsClosedPairs, current_char)
+    return "\<ESC>lxh:call AutoPairsJump(line('.'))\<CR>pi"
+  end
+
+  return ''
+endfunction
+
 function! AutoPairsMap(key)
     execute 'inoremap <silent> '.a:key.' <C-R>=AutoPairsInsert("\'.a:key.'")<CR>'
 endfunction
@@ -91,6 +105,7 @@ function! AutoPairsInit()
     if open != close
       call AutoPairsMap(close)
     end
+    let g:AutoPairsClosedPairs[close] = 1
   endfor
   execute 'inoremap <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
 
@@ -99,6 +114,7 @@ function! AutoPairsInit()
     execute 'inoremap <silent> <M-n> <ESC>:call AutoPairsJump()<CR>a'
     execute 'inoremap <silent> <M-a> <END>'
     execute 'inoremap <silent> <M-o> <END><CR>'
+    execute 'inoremap <silent> <M-e> <C-R>=AutoPairsExtend()<CR>'
   end
 endfunction
 
