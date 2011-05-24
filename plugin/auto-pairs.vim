@@ -36,7 +36,7 @@ function! AutoPairsInsert(key)
   end
 
   " Skip the character if current character is the same as input
-  if current_char == a:key
+  if current_char == a:key && !has_key(g:AutoPairs, a:key)
     return "\<Right>"
   end
 
@@ -47,6 +47,10 @@ function! AutoPairsInsert(key)
 
   let open = a:key
   let close = g:AutoPairs[open]
+
+  if current_char == close && open == close
+    return "\<Right>"
+  end
 
 
   " Auto return only if open and close is same
