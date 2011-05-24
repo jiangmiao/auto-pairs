@@ -1,10 +1,8 @@
-" Language:	JavaScript
+" Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Last Change:  2011-05-22
 " Version: 1.0.1
 " Repository: https://github.com/jiangmiao/auto-pairs
-"
-" Insert or delete brackets, parens, quotes in pairs.
 
 if exists('g:AutoPairsLoaded') || &cp
   finish
