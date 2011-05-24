@@ -96,7 +96,7 @@ function! AutoPairsExtend()
 endfunction
 
 function! AutoPairsMap(key)
-    execute 'inoremap <silent> '.a:key.' <C-R>=AutoPairsInsert("\'.a:key.'")<CR>'
+    execute 'inoremap <buffer> <silent> '.a:key.' <C-R>=AutoPairsInsert("\'.a:key.'")<CR>'
 endfunction
 
 function! AutoPairsInit()
@@ -107,15 +107,15 @@ function! AutoPairsInit()
     end
     let g:AutoPairsClosedPairs[close] = 1
   endfor
-  execute 'inoremap <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
+  execute 'inoremap <buffer> <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
 
   " If the keys map conflict with your own settings, delete or change them
   if g:AutoPairsShortcuts
-    execute 'inoremap <silent> <M-n> <ESC>:call AutoPairsJump()<CR>a'
-    execute 'inoremap <silent> <M-a> <END>'
-    execute 'inoremap <silent> <M-o> <END><CR>'
-    execute 'inoremap <silent> <M-e> <C-R>=AutoPairsExtend()<CR>'
+    execute 'inoremap <buffer> <silent> <M-n> <ESC>:call AutoPairsJump()<CR>a'
+    execute 'inoremap <buffer> <silent> <M-a> <END>'
+    execute 'inoremap <buffer> <silent> <M-o> <END><CR>'
+    execute 'inoremap <buffer> <silent> <M-e> <C-R>=AutoPairsExtend()<CR>'
   end
 endfunction
 
-call AutoPairsInit()
+au BufRead,BufNewFile * :call AutoPairsInit()
