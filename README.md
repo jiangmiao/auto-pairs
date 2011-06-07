@@ -18,9 +18,9 @@ Features
     input: foo[<BS>
     output: foo
 
-### Double input open brackets will insert new indented line.
+### Insert new indented line after Return
 
-    input: {{
+    input: {|} (press <CR> at |)
     output: {
         |
     }
@@ -35,20 +35,61 @@ Features
     input: "\'
     output: "\'"
 
+
+Shortcuts
+---------
+
+    System Shortcuts:
+        <CR>  : Insert new indented line after return if cursor in blank brackets or quotes.
+        <BS>  : Delete brackets in pair
+        <M-p> : Toggle Autopairs
+
+    Optional Shortcuts:
+    could be turn off by let g:AutoPairsShortcuts = 0
+        <M-n> jump to next closed bracket.
+        <M-a> jump to end of line.
+        <M-o> jump to newline with indented.
+
 Options
 -------
 *   g:AutoPairs
 
-    Default: {'(':')', '[':']', '{':'}',"'":"'",'"':'"'}
+        Default: {'(':')', '[':']', '{':'}',"'":"'",'"':'"'}
+
+*   g:AutoPairsShortcutToggle
+
+        Default: '<M-p>'
+
+        The shortcut to toggle autopairs.
 
 *   g:AutoPairsShortcuts 
-    
-    Default: 1 
+
+        Default: 1 
 
         imap 3 shortcuts
         <M-n> jump to next closed bracket.
         <M-a> jump to end of line.
         <M-o> jump to newline with indented.
+
+*   g:AutoPairsMapBS
+
+        Default : 1
+
+        Map <BS> to delete brackets, quotes in pair
+        execute 'inoremap <buffer> <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
+
+*   g:AutoPairsMapCR
+
+        Default : 1
+
+        Map <CR> to insert a new indented line if cursor in (|), {|} [|], '|', "|"
+        execute 'inoremap <buffer> <silent> <CR> <C-R>=AutoPairsReturn()<CR>'
+
+*   g:AutoPairsCenterLine
+
+        Default : 1
+
+        When g:AutoPairsMapCR is on, center current line after return if the line is at the bottom 1/3 of the window.
 
 TroubleShooting
 ---------------
