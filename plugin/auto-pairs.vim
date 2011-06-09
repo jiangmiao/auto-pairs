@@ -40,6 +40,10 @@ if !exists('g:AutoPairsShortcutToggle')
   let g:AutoPairsShortcutToggle = '<M-p>'
 end
 
+if !exists('g:AutoPairsShortcutFastWrap')
+  let g:AutoPairsShortcutFastWrap = '<M-e>'
+end
+
 let g:AutoPairsClosedPairs = {}
 
 
@@ -177,6 +181,7 @@ function! AutoPairsInit()
     execute 'inoremap <buffer> <silent> <CR> <C-R>=AutoPairsReturn()<CR>'
   end
 
+  execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
   execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutToggle.' <C-R>=AutoPairsToggle()<CR>'
   execute 'noremap <buffer> <silent> '.g:AutoPairsShortcutToggle.' :call AutoPairsToggle()<CR>'
   " If the keys map conflict with your own settings, delete or change them
@@ -184,7 +189,6 @@ function! AutoPairsInit()
     execute 'inoremap <buffer> <silent> <M-n> <ESC>:call AutoPairsJump()<CR>a'
     execute 'inoremap <buffer> <silent> <M-a> <END>'
     execute 'inoremap <buffer> <silent> <M-o> <END><CR>'
-    execute 'inoremap <buffer> <silent> <M-e> <C-R>=AutoPairsFastWrap()<CR>'
   end
 endfunction
 
