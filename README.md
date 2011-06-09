@@ -26,7 +26,7 @@ Features
     }
 
 ### Skip closed bracket.
-
+call feedkeys( 
     input: []
     output: []
 
@@ -34,6 +34,10 @@ Features
 
     input: "\'
     output: "\'"
+
+### Fast Wrap
+    input: |'hello' (press (<M-e> at|)
+    output: ('hello')
 
 
 Shortcuts
@@ -43,6 +47,7 @@ Shortcuts
         <CR>  : Insert new indented line after return if cursor in blank brackets or quotes.
         <BS>  : Delete brackets in pair
         <M-p> : Toggle Autopairs
+        <M-e> : Fast Wrap
 
     Optional Shortcuts:
     could be turn off by let g:AutoPairsShortcuts = 0
@@ -61,6 +66,14 @@ Options
         Default: '<M-p>'
 
         The shortcut to toggle autopairs.
+
+*   g:AutoPairsShortcutFastWrap
+       
+        Default: '<M-e>'
+
+        Fast wrap the word. all pairs will be consider as a block (include <>).
+        (|)'hello' after fast wrap at |, the word will be ('hello')
+        (|)<hello> after fast wrap at |, the word will be (<hello>)
 
 *   g:AutoPairsShortcuts 
 
