@@ -8,36 +8,37 @@ copy plugin/auto-pairs.vim to ~/.vim/plugin
 
 Features
 --------
-### Insert in pair
+*   Insert in pair
      
-    input: [
-    output: [|]
+        input: [
+        output: [|]
 
-### Delete in pair
+*   Delete in pair
      
-    input: foo[<BS>
-    output: foo
+        input: foo[<BS>
+        output: foo
 
-### Insert new indented line after Return
+*   Insert new indented line after Return
 
-    input: {|} (press <CR> at |)
-    output: {
-        |
-    }
+        input: {|} (press <CR> at |)
+        output: {
+            |
+        }
 
-### Skip closed bracket.
-call feedkeys( 
-    input: []
-    output: []
+*   Skip closed bracket.
 
-### Ignore auto pair when previous character is \
+        input: []
+        output: []
 
-    input: "\'
-    output: "\'"
+*   Ignore auto pair when previous character is \
 
-### Fast Wrap
-    input: |'hello' (press (<M-e> at|)
-    output: ('hello')
+        input: "\'
+        output: "\'"
+
+*   Fast Wrap
+
+        input: |'hello' (press (<M-e> at|)
+        output: ('hello')
 
 
 Shortcuts
