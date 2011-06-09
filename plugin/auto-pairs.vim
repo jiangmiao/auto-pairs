@@ -109,8 +109,7 @@ function! AutoPairsJump()
 endfunction
 
 " Fast wrap the word in brackets
-" Haven't finished yet
-function! AutoPairsExtend()
+function! AutoPairsFastWrap()
   let line = getline('.')
   let current_char = line[col('.')-1]
   let next_char = line[col('.')]
@@ -185,7 +184,7 @@ function! AutoPairsInit()
     execute 'inoremap <buffer> <silent> <M-n> <ESC>:call AutoPairsJump()<CR>a'
     execute 'inoremap <buffer> <silent> <M-a> <END>'
     execute 'inoremap <buffer> <silent> <M-o> <END><CR>'
-    execute 'inoremap <buffer> <silent> <M-e> <C-R>=AutoPairsExtend()<CR>'
+    execute 'inoremap <buffer> <silent> <M-e> <C-R>=AutoPairsFastWrap()<CR>'
   end
 endfunction
 
