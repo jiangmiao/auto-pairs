@@ -182,15 +182,15 @@ function! AutoPairsInit()
   endfor
 
   if g:AutoPairsMapBS
-    execute 'inoremap <buffer> <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
+    execute 'inoremap <buffer> <silent> <expr> <BS> AutoPairsDelete()'
   end
 
   if g:AutoPairsMapCR
-    execute 'inoremap <buffer> <silent> <CR> <C-R>=AutoPairsReturn()<CR>'
+    execute 'inoremap <buffer> <silent> <expr> <CR> AutoPairsReturn()'
   end
 
   execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
-  execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutToggle.' <C-R>=AutoPairsToggle()<CR>'
+  execute 'inoremap <buffer> <silent> <expr> '.g:AutoPairsShortcutToggle.' AutoPairsToggle()'
   execute 'noremap <buffer> <silent> '.g:AutoPairsShortcutToggle.' :call AutoPairsToggle()<CR>'
   " If the keys map conflict with your own settings, delete or change them
   if g:AutoPairsShortcuts
