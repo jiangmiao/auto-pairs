@@ -164,7 +164,7 @@ function! AutoPairsReturn()
   let cur_char = line[col('.')-1]
   if has_key(g:AutoPairs, prev_char) && g:AutoPairs[prev_char] == cur_char
     if g:AutoPairsCenterLine && winline() * 1.5 >= winheight(0)
-      let cmd = ";\<C-O>zz\<DEL>"
+      let cmd = " \<C-O>zz\<ESC>cl"
     end
     return "\<CR>\<C-O>O".cmd
   end
