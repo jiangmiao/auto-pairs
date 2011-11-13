@@ -170,6 +170,7 @@ function! AutoPairsReturn()
 endfunction
 
 function! AutoPairsInit()
+  let b:autopairs_loaded  = 1
   let b:autopairs_enabled = 1
   for [open, close] in items(g:AutoPairs)
     call AutoPairsMap(open)
@@ -198,4 +199,12 @@ function! AutoPairsInit()
   end
 endfunction
 
-au BufRead,BufNewFile,BufCreate,VimEnter * :call AutoPairsInit()
+function! AutoPairsForceInit()
+  if exists('b:autopairs_loaded')
+    return
+  else
+    call AutoPairsInit()
+  endif
+endfunction
+
+au BufEnter * :call AutoPairsForceInit()
