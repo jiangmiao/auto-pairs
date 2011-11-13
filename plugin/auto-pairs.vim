@@ -99,7 +99,8 @@ function! AutoPairsDelete()
   if has_key(g:AutoPairs, prev_char)
     let close = g:AutoPairs[prev_char]
     if match(line,'^\s*'.close, col('.')-1) != -1
-      return "\<Left>\<C-O>cf".close
+      let space = matchstr(line, '^\s*', col('.')-1)
+      return "\<BS>". repeat("\<DEL>", len(space)+1)
     end
   end
 
