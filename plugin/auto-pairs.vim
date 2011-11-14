@@ -165,7 +165,7 @@ function! AutoPairsReturn()
     if g:AutoPairsCenterLine && winline() * 1.5 >= winheight(0)
       let cmd = " \<C-O>zz\<ESC>cl"
     end
-    return "\<DEL>\<CR>".cur_char."\<C-O>O".cmd
+    return "\<DEL>\<CR>".cur_char."\<ESC>=ko".cmd
   end
   return "\<CR>"
 endfunction
