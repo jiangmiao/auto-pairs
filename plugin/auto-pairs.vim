@@ -1,7 +1,7 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
-" Last Change:  2011-09-06
-" Version: 1.1.1
+" Last Change:  2011-12-07
+" Version: 1.1.2
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
 
@@ -165,7 +165,7 @@ function! AutoPairsReturn()
     if g:AutoPairsCenterLine && winline() * 1.5 >= winheight(0)
       let cmd = " \<C-O>zz\<ESC>cl"
     end
-    return "\<DEL>\<CR>".cur_char."\<ESC>=ko".cmd
+    return "\<DEL>\<CR>".cur_char."\<ESC>k==o".cmd
   end
   return "\<CR>"
 endfunction
