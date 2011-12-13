@@ -25,6 +25,11 @@ Features
             |
         }
 
+*   Insert spaces before closing characters
+
+        input: {|} (press <SPACE> at |)
+        output: { | }
+
 *   Skip closed bracket.
 
         input: []
@@ -104,6 +109,13 @@ Options
         Default : 1
 
         When g:AutoPairsMapCR is on, center current line after return if the line is at the bottom 1/3 of the window.
+
+*   g:AutoPairsMapSpace
+
+        Default : 1
+
+        Map <space> to insert a space after the opening character and before the closing one.
+        execute 'inoremap <buffer> <silent> <CR> <C-R>=AutoPairsReturn()<CR>'
 
 TroubleShooting
 ---------------
