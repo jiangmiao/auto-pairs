@@ -32,6 +32,10 @@ if !exists('g:AutoPairsMapCR')
   let g:AutoPairsMapCR = 1
 end
 
+if !exists('g:AutoPairsMapSpace')
+  let g:AutoPairsMapSpace = 1
+end
+
 if !exists('g:AutoPairsCenterLine')
   let g:AutoPairsCenterLine = 1
 end
@@ -177,6 +181,17 @@ function! AutoPairsReturn()
   return "\<CR>"
 endfunction
 
+function! AutoPairsSpace()
+  let line = getline('.')
+  let prev_char = line[col('.')-2]
+  let cmd = ''
+  let cur_char =line[col('.')-1]
+  if has_key(g:AutoPairs, prev_char) && g:AutoPairs[prev_char] == cur_char
+    let cmd = "\<SPACE>\<ESC>i"
+  endif
+  return "\<SPACE>".cmd
+endfunction
+
 function! AutoPairsInit()
   let b:autopairs_loaded  = 1
   let b:autopairs_enabled = 1
@@ -194,6 +209,10 @@ function! AutoPairsInit()
 
   if g:AutoPairsMapCR
     execute 'inoremap <buffer> <silent> <expr> <CR> AutoPairsReturn()'
+  end
+
+  if g:AutoPairsMapSpace
+    execute 'inoremap <buffer> <silent> <expr> <space> AutoPairsSpace()'
   end
 
   execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
