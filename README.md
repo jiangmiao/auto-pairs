@@ -25,10 +25,16 @@ Features
             |
         }
 
-*   Insert spaces before closing characters
+*   Insert spaces before closing characters, only for [], (), {}
 
         input: {|} (press <SPACE> at |)
         output: { | }
+
+        input: {|} (press <SPACE>foo} at |)
+        output: { foo }|
+
+        input: '|' (press <SPACE> at |)
+        output: ' |'
 
 *   Skip closed bracket.
 
@@ -115,7 +121,7 @@ Options
         Default : 1
 
         Map <space> to insert a space after the opening character and before the closing one.
-        execute 'inoremap <buffer> <silent> <CR> <C-R>=AutoPairsReturn()<CR>'
+        execute 'inoremap <buffer> <silent> <CR> <C-R>=AutoPairsSpace()<CR>'
 
 TroubleShooting
 ---------------
@@ -125,3 +131,11 @@ TroubleShooting
     Or the plugin conflict with some other plugins.
     use command :call AutoPairsInit() to remap the keys.
 
+
+* How to insert parens purely
+
+    There are 3 ways
+    1 use Ctrl-V ) to insert paren without trigger the plugin.
+    2 use Alt-P to turn off the plugin.
+    3 use DEL or <C-O>x to delete the character insert by plugin.
+    
