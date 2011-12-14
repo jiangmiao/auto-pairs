@@ -165,7 +165,14 @@ function! AutoPairsReturn()
     if g:AutoPairsCenterLine && winline() * 1.5 >= winheight(0)
       let cmd = " \<C-O>zz\<ESC>cl"
     end
-    return "\<DEL>\<CR>".cur_char."\<ESC>k==o".cmd
+    " conflict from javascript and coffee
+    " javascript   need   indent new line
+    " coffeescript forbid indent new line
+    if &filetype == 'coffeescript'
+      return "\<DEL>\<CR>".cur_char."\<ESC>k==o".cmd
+    else
+      return "\<DEL>\<CR>".cur_char."\<ESC>=ko".cmd
+    endif
   end
   return "\<CR>"
 endfunction
