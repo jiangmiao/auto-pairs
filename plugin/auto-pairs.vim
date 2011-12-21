@@ -84,6 +84,16 @@ function! AutoPairsInsert(key)
       return "\<Right>\<Right>"
     end
 
+    " Skip the character if next
+    if next_char == ''
+      let next_lineno = line('.')+1
+      let next_line = getline(nextnonblank(next_lineno))
+      let next_char = matchstr(next_line, '\s*\zs.')
+      if next_char == a:key
+        return "\<ESC>e^a"
+      endif
+    endif
+
     " Skip the character if current character is the same as input
     if current_char == a:key
       return "\<Right>"
