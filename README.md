@@ -51,6 +51,19 @@ Features
         input: |'hello' (press (<M-e> at|)
         output: ('hello')
 
+*   Quick jump to closed pair.
+        
+        input: 
+        {
+            something;|
+        }
+
+        (press } at |)
+
+        output:
+        {
+
+        }|
 
 Shortcuts
 ---------
@@ -135,7 +148,11 @@ TroubleShooting
 * How to insert parens purely
 
     There are 3 ways
-    1 use Ctrl-V ) to insert paren without trigger the plugin.
-    2 use Alt-P to turn off the plugin.
-    3 use DEL or <C-O>x to delete the character insert by plugin.
+
+    1. use Ctrl-V ) to insert paren without trigger the plugin.
+
+    2. use Alt-P to turn off the plugin.
+
+    3. use DEL or <C-O>x to delete the character insert by plugin.
+
     

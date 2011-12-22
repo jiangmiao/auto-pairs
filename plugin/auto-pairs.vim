@@ -85,7 +85,7 @@ function! AutoPairsInsert(key)
     end
 
     " Skip the character if next
-    if next_char == ''
+    if current_char == ''
       let next_lineno = line('.')+1
       let next_line = getline(nextnonblank(next_lineno))
       let next_char = matchstr(next_line, '\s*\zs.')
