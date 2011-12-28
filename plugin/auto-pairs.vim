@@ -110,7 +110,10 @@ function! AutoPairsInsert(key)
     return "\<Right>"
   end
 
-  return open.close."\<Left>"
+  if a:key == "'" && prev_char =~ '\v\w'
+    return a:key
+  else
+    return open.close."\<Left>"
 endfunction
 
 function! AutoPairsDelete()
