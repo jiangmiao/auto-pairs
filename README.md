@@ -36,6 +36,11 @@ Features
         input: '|' (press <SPACE> at |)
         output: ' |'
 
+*   Skip ' when inside a word
+
+        input: foo| (press ' at |)
+        output: foo'
+
 *   Skip closed bracket.
 
         input: []
@@ -155,4 +160,7 @@ TroubleShooting
 
     3. use DEL or <C-O>x to delete the character insert by plugin.
 
-    
+
+Contributors
+------------
+* [camthompson](https://github.com/camthompson)
