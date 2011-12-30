@@ -78,12 +78,6 @@ function! AutoPairsInsert(key)
     return a:key
   end
 
-  " Ignore ' if follows a word
-  if a:key == "'" && prev_char =~ '\v\w'
-    return a:key
-  end
-
-
   if !has_key(g:AutoPairs, a:key)
     " Skip the character if next character is space
     if current_char == ' ' && next_char == a:key
@@ -114,6 +108,12 @@ function! AutoPairsInsert(key)
 
   if current_char == close && open == close
     return "\<Right>"
+  end
+
+  " Ignore auto close ' if follows a word
+  " MUST after closed check. 'hello|'
+  if a:key == "'" && prev_char =~ '\v\w'
+    return a:key
   end
 
   return open.close."\<Left>"
