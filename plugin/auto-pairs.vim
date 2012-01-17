@@ -1,7 +1,7 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
-" Last Change:  2011-12-29
+" Last Change:  2012-01-17
 " Version: 1.1.4
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
@@ -114,6 +114,16 @@ function! AutoPairsInsert(key)
   " MUST after closed check. 'hello|'
   if a:key == "'" && prev_char =~ '\v\w'
     return a:key
+  end
+
+  " support for ''' ``` and """
+  if open == close
+    " The key must be ' " `
+    let pprev_char = line[col('.')-3]
+    if pprev_char == open && prev_char == open
+      " Double pair found
+      return a:key
+    end
   end
 
   return open.close."\<Left>"

@@ -70,6 +70,14 @@ Features
 
         }|
 
+*   Support ``` ''' and """
+
+        input:
+            '''
+
+        output:
+            '''
+
 Shortcuts
 ---------
 
@@ -89,7 +97,7 @@ Options
 -------
 *   g:AutoPairs
 
-        Default: {'(':')', '[':']', '{':'}',"'":"'",'"':'"'}
+        Default: {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 
 *   g:AutoPairsShortcutToggle
 
