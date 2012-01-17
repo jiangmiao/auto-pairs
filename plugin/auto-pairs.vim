@@ -20,7 +20,7 @@ if !exists('g:AutoPairsShortcuts')
 end
 
 if !exists('g:AutoPairs')
-  let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"'}
+  let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 end
 
 if !exists('g:AutoPairsParens')
@@ -84,7 +84,7 @@ function! AutoPairsInsert(key)
       return "\<Right>\<Right>"
     end
 
-    " Skip the character if next
+    " Skip the character if closed pair is next character
     if current_char == ''
       let next_lineno = line('.')+1
       let next_line = getline(nextnonblank(next_lineno))
