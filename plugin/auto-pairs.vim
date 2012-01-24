@@ -1,8 +1,8 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
-" Last Change:  2012-01-17
-" Version: 1.1.4
+" Last Change:  2012-01-24
+" Version: 1.1.5
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
 
@@ -206,7 +206,8 @@ endfunction
 
 function! AutoPairsReturn()
   let line = getline('.')
-  let prev_char = line[col('.')-2]
+  let pline = getline(line('.')-1)
+  let prev_char = pline[strlen(pline)-1]
   let cmd = ''
   let cur_char = line[col('.')-1]
   if has_key(g:AutoPairs, prev_char) && g:AutoPairs[prev_char] == cur_char
@@ -217,12 +218,12 @@ function! AutoPairsReturn()
     " javascript   need   indent new line
     " coffeescript forbid indent new line
     if &filetype == 'coffeescript'
-      return "\<DEL>\<CR>".cur_char."\<ESC>k==o".cmd
+      return "\<ESC>k==o".cmd
     else
-      return "\<DEL>\<CR>".cur_char."\<ESC>=ko".cmd
+      return "\<ESC>=ko".cmd
     endif
   end
-  return "\<CR>"
+  return ''
 endfunction
 
 function! AutoPairsSpace()
@@ -239,6 +240,8 @@ endfunction
 function! AutoPairsInit()
   let b:autopairs_loaded  = 1
   let b:autopairs_enabled = 1
+
+  " buffer level map pairs keys
   for [open, close] in items(g:AutoPairs)
     call AutoPairsMap(open)
     if open != close
@@ -247,19 +250,17 @@ function! AutoPairsInit()
     let g:AutoPairsClosedPairs[close] = 1
   endfor
 
+  " Still use <buffer> level mapping for <BS> <SPACE>
   if g:AutoPairsMapBS
     execute 'inoremap <buffer> <silent> <expr> <BS> AutoPairsDelete()'
   end
 
-  if g:AutoPairsMapCR
-    execute 'inoremap <buffer> <silent> <expr> <CR> AutoPairsReturn()'
-  end
-
   if g:AutoPairsMapSpace
-    execute 'inoremap <buffer> <silent> <expr> <space> AutoPairsSpace()'
+    execute 'inoremap <buffer> <silent> <expr> <SPACE> AutoPairsSpace()'
   end
 
   execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
+  " use <expr> to ensure showing the status when toggle
   execute 'inoremap <buffer> <silent> <expr> '.g:AutoPairsShortcutToggle.' AutoPairsToggle()'
   execute 'noremap <buffer> <silent> '.g:AutoPairsShortcutToggle.' :call AutoPairsToggle()<CR>'
   " If the keys map conflict with your own settings, delete or change them
@@ -277,5 +278,19 @@ function! AutoPairsForceInit()
     call AutoPairsInit()
   endif
 endfunction
+
+
+" Global keys mapping
+" comptible with other plugin
+if g:AutoPairsMapCR
+  let old_cr = maparg('<CR>', 'i')
+  if old_cr == ''
+    let old_cr = '<CR>'
+  endif
+
+  if old_cr !~ 'AutoPairsReturn'
+    execute 'imap <silent> <CR> '.old_cr.'<C-R>=AutoPairsReturn()<CR>'
+  end
+endif
 
 au BufEnter * :call AutoPairsForceInit()
