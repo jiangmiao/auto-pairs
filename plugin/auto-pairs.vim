@@ -149,6 +149,12 @@ function! AutoPairsDelete()
     if match(line,'^\s*'.close, col('.')-1) != -1
       let space = matchstr(line, '^\s*', col('.')-1)
       return "\<BS>". repeat("\<DEL>", len(space)+1)
+    else
+      let nline = getline(line('.')+1)
+      if nline =~ '^\s*'.close
+        let space = matchstr(nline, '^\s*')
+        return "\<BS>\<DEL>". repeat("\<DEL>", len(space)+1)
+      end
     end
   end
 
