@@ -285,6 +285,8 @@ function! AutoPairsForceInit()
   endif
 endfunction
 
+" Always silent the command
+inoremap <silent> <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
 
 " Global keys mapping
 " comptible with other plugin
@@ -295,7 +297,7 @@ if g:AutoPairsMapCR
   endif
 
   if old_cr !~ 'AutoPairsReturn'
-    execute 'imap <silent> <CR> '.old_cr.'<C-R>=AutoPairsReturn()<CR>'
+    execute 'imap <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
   end
 endif
 
