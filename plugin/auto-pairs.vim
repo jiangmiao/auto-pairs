@@ -297,7 +297,7 @@ if g:AutoPairsMapCR
   endif
 
   if old_cr !~ 'AutoPairsReturn'
-    execute 'imap <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
+    execute 'imap <CR> '.old_cr.'<SID>AutoPairsReturn'
   end
 endif
 
