@@ -196,7 +196,8 @@ function! AutoPairsFastWrap()
 endfunction
 
 function! AutoPairsMap(key)
-    execute 'inoremap <buffer> <silent> '.a:key.' <C-R>=AutoPairsInsert("\'.a:key.'")<CR>'
+  let escaped_key = substitute(a:key, "'", "''", 'g')
+  execute 'inoremap <buffer> <silent> '.a:key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
 endfunction
 
 function! AutoPairsToggle()
