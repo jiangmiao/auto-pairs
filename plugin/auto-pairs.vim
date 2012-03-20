@@ -54,6 +54,10 @@ if !exists('g:AutoPairsShortcutFastWrap')
   let g:AutoPairsShortcutFastWrap = '<M-e>'
 end
 
+if !exists('g:AutoPairsShortcutJump')
+  let g:AutoPairsShortcutJump = '<M-n>'
+endif
+
 let g:AutoPairsClosedPairs = {}
 
 
@@ -162,7 +166,7 @@ function! AutoPairsDelete()
 endfunction
 
 function! AutoPairsJump()
-  call search('[{("\[\]'')}]','W')
+  call search('["\]'')}]','W')
 endfunction
 
 " Fast wrap the word in brackets
@@ -266,16 +270,21 @@ function! AutoPairsInit()
     execute 'inoremap <buffer> <silent> <expr> <SPACE> AutoPairsSpace()'
   end
 
-  execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
-  " use <expr> to ensure showing the status when toggle
-  execute 'inoremap <buffer> <silent> <expr> '.g:AutoPairsShortcutToggle.' AutoPairsToggle()'
-  execute 'noremap <buffer> <silent> '.g:AutoPairsShortcutToggle.' :call AutoPairsToggle()<CR>'
-  " If the keys map conflict with your own settings, delete or change them
-  if g:AutoPairsShortcuts
-    execute 'inoremap <buffer> <silent> <M-n> <ESC>:call AutoPairsJump()<CR>a'
-    execute 'inoremap <buffer> <silent> <M-a> <END>'
-    execute 'inoremap <buffer> <silent> <M-o> <END><CR>'
+  if g:AutoPairsShortcutFastWrap != ''
+    execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
   end
+
+  if g:AutoPairsShortcutToggle != ''
+    " use <expr> to ensure showing the status when toggle
+    execute 'inoremap <buffer> <silent> <expr> '.g:AutoPairsShortcutToggle.' AutoPairsToggle()'
+    execute 'noremap <buffer> <silent> '.g:AutoPairsShortcutToggle.' :call AutoPairsToggle()<CR>'
+  end
+
+  if g:AutoPairsShortcutJump != ''
+    execute 'inoremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' <ESC>:call AutoPairsJump()<CR>a'
+    execute 'noremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' :call AutoPairsJump()<CR>'
+  end
+
 endfunction
 
 function! AutoPairsForceInit()

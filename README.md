@@ -84,14 +84,15 @@ Shortcuts
     System Shortcuts:
         <CR>  : Insert new indented line after return if cursor in blank brackets or quotes.
         <BS>  : Delete brackets in pair
-        <M-p> : Toggle Autopairs
-        <M-e> : Fast Wrap
+        <M-p> : Toggle Autopairs (g:AutoPairsShortcutToggle)
+        <M-e> : Fast Wrap (g:AutoPairsShortcutFastWrap)
+        <M-n> : Jump to next closed pair (g:AutoPairsShortcutJump)
 
-    Optional Shortcuts:
-    could be turn off by let g:AutoPairsShortcuts = 0
-        <M-n> jump to next closed bracket.
-        <M-a> jump to end of line.
-        <M-o> jump to newline with indented.
+    If <M-p> <M-e> or <M-n> conflict with another keys or want to bind to another keys, add
+
+        let g:AutoPairscutToggle = '<another key>'
+
+    to .vimrc, it the key is empty string '', then the shortcut will be disabled.
 
 Options
 -------
@@ -113,14 +114,11 @@ Options
         (|)'hello' after fast wrap at |, the word will be ('hello')
         (|)<hello> after fast wrap at |, the word will be (<hello>)
 
-*   g:AutoPairsShortcuts 
+*   g:AutoPairsShortcutJump
 
-        Default: 1 
+        Default: '<M-n>'
 
-        imap 3 shortcuts
-        <M-n> jump to next closed bracket.
-        <M-a> jump to end of line.
-        <M-o> jump to newline with indented.
+        Jump to the next closed pair
 
 *   g:AutoPairsMapBS
 
