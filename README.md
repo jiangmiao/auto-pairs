@@ -84,7 +84,7 @@ Features
 		output: if(a[3])| (In Fly Mode)
 		output: if(a[3)]) (Without Fly Mode)
 
-		input: 
+		input:
 		{
 			hello();|
 			world();
@@ -92,7 +92,7 @@ Features
 
 		(press } at |)
 
-		output: 
+		output:
 		{
 			hello();
 			world();
@@ -116,7 +116,7 @@ Fly Mode
 
 	Default Options:
 
-		let g:AutoPairs_FlyMode = 1
+		let g:AutoPairsFlyMode = 1
 		let g:AutoPairsShortcutBackInsert = '<M-b>'
 
 Shortcuts
