@@ -110,11 +110,9 @@ function! AutoPairsInsert(key)
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
     if g:AutoPairsFlyMode && has_key(g:AutoPairsClosedPairs, a:key)
-      let b:autopairs_saved_pair = [a:key, getpos('.')]
-      " Use 's' flag to overwritee '' or not is a question
-      if(search(a:key, 'W'))
+      if search(a:key, 'W')
         return "\<Right>"
-      end
+      endif
     endif
 
     " Input directly if the key is not an open key
@@ -215,7 +213,7 @@ endfunction
 
 function! AutoPairsMap(key)
   let escaped_key = substitute(a:key, "'", "''", 'g')
-  execute 'inoremap <buffer> <silent> '.a:key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
+  execute 'inoremap <buffer> <silent> <expr>'.a:key." AutoPairsInsert('".escaped_key."')"
 endfunction
 
 function! AutoPairsToggle()
@@ -315,6 +313,14 @@ function! AutoPairsInit()
 
 endfunction
 
+function! s:ExpandMap(map)
+  let map = a:map
+  if map =~ '<Plug>'
+    let map = substitute(map, '\(<Plug>\w\+\)', '\=maparg(submatch(1), "i")', 'g')
+  endif
+  return map
+endfunction
+
 function! AutoPairsForceInit()
   if exists('b:autopairs_loaded')
     return
@@ -327,8 +333,8 @@ function! AutoPairsForceInit()
   " supertab doesn't support <SID>AutoPairsReturn
   " when use <SID>AutoPairsReturn  will cause Duplicated <CR>
   "
-  " and when load after vim-endwise will cause endwise close incorrect. so always
-  " load AutoPairs at last
+  " and when load after vim-endwise will cause unexpected endwise inserted. 
+  " so always load AutoPairs at last
   
   " Buffer level keys mapping
   " comptible with other plugin
@@ -336,6 +342,8 @@ function! AutoPairsForceInit()
     let old_cr = maparg('<CR>', 'i')
     if old_cr == ''
       let old_cr = '<CR>'
+    else
+      let old_cr = s:ExpandMap(old_cr)
     endif
 
     if old_cr !~ 'AutoPairsReturn'
