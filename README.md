@@ -9,12 +9,12 @@ copy plugin/auto-pairs.vim to ~/.vim/plugin
 Features
 --------
 *   Insert in pair
-     
+
         input: [
         output: [|]
 
 *   Delete in pair
-     
+
         input: foo[<BS>
         output: foo
 
@@ -57,8 +57,8 @@ Features
         output: ('hello')
 
 *   Quick jump to closed pair.
-        
-        input: 
+
+        input:
         {
             something;|
         }
@@ -78,6 +78,47 @@ Features
         output:
             '''
 
+*  Fly Mode
+
+		input: if(a[3)
+		output: if(a[3])| (In Fly Mode)
+		output: if(a[3)]) (Without Fly Mode)
+
+		input: 
+		{
+			hello();|
+			world();
+		}
+
+		(press } at |)
+
+		output: 
+		{
+			hello();
+			world();
+		}|
+
+		(then press <M-b> at | to do backinsert)
+		output:
+		{
+			hello();}|
+			world();
+		}
+
+		See Fly Mode section for details
+
+Fly Mode
+--------
+
+	Fly Mode will always force closed-pair jumping instead of inserting. only for ")", "}", "]"
+	If jumps in mistake, could use AutoPairsBackInsert(Default Key: <M-b>) to jump back and insert closed pair.
+	the most situation maybe want to insert single closed pair in the string, eg ")"
+
+	Default Options:
+
+		let g:AutoPairs_FlyMode = 1
+		let g:AutoPairsShortcutBackInsert = '<M-b>'
+
 Shortcuts
 ---------
 
@@ -87,10 +128,11 @@ Shortcuts
         <M-p> : Toggle Autopairs (g:AutoPairsShortcutToggle)
         <M-e> : Fast Wrap (g:AutoPairsShortcutFastWrap)
         <M-n> : Jump to next closed pair (g:AutoPairsShortcutJump)
+		<M-b> : BackInsert
 
     If <M-p> <M-e> or <M-n> conflict with another keys or want to bind to another keys, add
 
-        let g:AutoPairscutToggle = '<another key>'
+        let g:AutoPairShortcutToggle = '<another key>'
 
     to .vimrc, it the key is empty string '', then the shortcut will be disabled.
 
@@ -107,7 +149,7 @@ Options
         The shortcut to toggle autopairs.
 
 *   g:AutoPairsShortcutFastWrap
-       
+
         Default: '<M-e>'
 
         Fast wrap the word. all pairs will be consider as a block (include <>).
@@ -147,9 +189,21 @@ Options
         Map <space> to insert a space after the opening character and before the closing one.
         execute 'inoremap <buffer> <silent> <CR> <C-R>=AutoPairsSpace()<CR>'
 
+*	g:AutoPairsFlyMode
+
+		Default : 1
+
+		see FlyMode section for details.
+
+*	g:AutoPairsShortcutBackInsert
+
+		Default : <M-b>
+
+		Work with FlyMode, insert the key at the Fly Mode jumped postion
+
 TroubleShooting
 ---------------
-    The script will remap keys ([{'"}]) <BS>, 
+    The script will remap keys ([{'"}]) <BS>,
     If auto pairs cannot work, use :imap ( to check if the map is corrected.
     The correct map should be <C-R>=AutoPairsInsert("\(")<CR>
     Or the plugin conflict with some other plugins.

@@ -1,8 +1,8 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
-" Last Change:  2012-03-22
-" Version: 1.1.6
+" Last Change:  2012-05-14
+" Version: 1.2.0
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
 
@@ -10,14 +10,6 @@ if exists('g:AutoPairsLoaded') || &cp
   finish
 end
 let g:AutoPairsLoaded = 1
-
-" Shortcurs for 
-" <M-o> newline with indetation
-" <M-a> jump to of line
-" <M-n> jmup to next pairs
-if !exists('g:AutoPairsShortcuts')
-  let g:AutoPairsShortcuts = 1
-end
 
 if !exists('g:AutoPairs')
   let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
@@ -58,8 +50,20 @@ if !exists('g:AutoPairsShortcutJump')
   let g:AutoPairsShortcutJump = '<M-n>'
 endif
 
-let g:AutoPairsClosedPairs = {}
+" Fly mode will for closed pair to jump to closed pair instead of insert.
+" also support AutoPairsBackInsert to insert pairs where jumped.
+if !exists('g:AutoPairsFlyMode')
+  let g:AutoPairsFlyMode = 1
+endif
 
+" Work with Fly Mode, insert pair where jumped
+if !exists('g:AutoPairsShortcutBackInsert')
+  let g:AutoPairsShortcutBackInsert = '<M-b>'
+endif
+
+
+" Will auto generated {']' => 1, ..., '}' => 1}in initialize.
+let g:AutoPairsClosedPairs = {}
 
 
 function! AutoPairsInsert(key)
@@ -82,6 +86,7 @@ function! AutoPairsInsert(key)
     return a:key
   end
 
+  " The key is difference open-pair, then it means only for ) ] } by default
   if !has_key(g:AutoPairs, a:key)
     " Skip the character if next character is space
     if current_char == ' ' && next_char == a:key
@@ -102,6 +107,15 @@ function! AutoPairsInsert(key)
     if current_char == a:key
       return "\<Right>"
     end
+
+    " Fly Mode, and the key is closed-pairs, search closed-pair and jump
+    if g:AutoPairsFlyMode && has_key(g:AutoPairsClosedPairs, a:key)
+      let b:autopairs_saved_pair = [a:key, getpos('.')]
+      " Use 's' flag to overwritee '' or not is a question
+      if(search(a:key, 'W'))
+        return "\<Right>"
+      end
+    endif
 
     " Input directly if the key is not an open key
     return a:key
@@ -181,7 +195,7 @@ function! AutoPairsFastWrap()
   end
   
   normal! x
-  if match(next_char, '\s') != -1
+  if next_char =~ '\s'
     call search('\S', 'W')
     let next_char = getline('.')[col('.')-1]
   end
@@ -191,7 +205,7 @@ function! AutoPairsFastWrap()
     call search(close, 'W')
     return "\<RIGHT>".current_char."\<LEFT>"
   else
-    if match(next_char, '\w') != -1
+    if next_char =~ '\w'
       execute "normal! he"
     end
     execute "normal! a".current_char
@@ -228,7 +242,7 @@ function! AutoPairsReturn()
     " conflict with javascript and coffee
     " javascript   need   indent new line
     " coffeescript forbid indent new line
-    if &filetype == 'coffeescript'
+    if &filetype == 'coffeescript' || &filetype == 'coffee'
       return "\<ESC>k==o".cmd
     else
       return "\<ESC>=ko".cmd
@@ -246,6 +260,16 @@ function! AutoPairsSpace()
     let cmd = "\<SPACE>\<LEFT>"
   endif
   return "\<SPACE>".cmd
+endfunction
+
+function! AutoPairsBackInsert()
+  if exists('b:autopairs_saved_pair')
+    let pair = b:autopairs_saved_pair[0]
+    let pos  = b:autopairs_saved_pair[1]
+    call setpos('.', pos)
+    return pair
+  endif
+  return ''
 endfunction
 
 function! AutoPairsInit()
@@ -272,6 +296,10 @@ function! AutoPairsInit()
 
   if g:AutoPairsShortcutFastWrap != ''
     execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
+  end
+
+  if g:AutoPairsShortcutBackInsert != ''
+    execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutBackInsert.' <C-R>=AutoPairsBackInsert()<CR>'
   end
 
   if g:AutoPairsShortcutToggle != ''
