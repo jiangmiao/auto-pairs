@@ -88,25 +88,29 @@ function! AutoPairsInsert(key)
 
   " The key is difference open-pair, then it means only for ) ] } by default
   if !has_key(g:AutoPairs, a:key)
-    " Skip the character if next character is space
-    if current_char == ' ' && next_char == a:key
-      return "\<Right>\<Right>"
-    end
-
-    " Skip the character if closed pair is next character
-    if current_char == ''
-      let next_lineno = line('.')+1
-      let next_line = getline(nextnonblank(next_lineno))
-      let next_char = matchstr(next_line, '\s*\zs.')
-      if next_char == a:key
-        return "\<ESC>e^a"
-      endif
-    endif
+    let b:autopairs_saved_pair = [a:key, getpos('.')]
 
     " Skip the character if current character is the same as input
     if current_char == a:key
       return "\<Right>"
     end
+
+    if !g:AutoPairsFlyMode
+      " Skip the character if next character is space
+      if current_char == ' ' && next_char == a:key
+        return "\<Right>\<Right>"
+      end
+
+      " Skip the character if closed pair is next character
+      if current_char == ''
+        let next_lineno = line('.')+1
+        let next_line = getline(nextnonblank(next_lineno))
+        let next_char = matchstr(next_line, '\s*\zs.')
+        if next_char == a:key
+          return "\<ESC>e^a"
+        endif
+      endif
+    endif
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
     if g:AutoPairsFlyMode && has_key(g:AutoPairsClosedPairs, a:key)
@@ -213,7 +217,8 @@ endfunction
 
 function! AutoPairsMap(key)
   let escaped_key = substitute(a:key, "'", "''", 'g')
-  execute 'inoremap <buffer> <silent> <expr>'.a:key." AutoPairsInsert('".escaped_key."')"
+  " use expr will cause search() doesn't work
+  execute 'inoremap <buffer> <silent> '.a:key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
 endfunction
 
 function! AutoPairsToggle()
