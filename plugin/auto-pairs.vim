@@ -321,13 +321,13 @@ function! AutoPairsForceInit()
   end
   " for auto-pairs starts with 'a', so the priority is higher than supertab and vim-endwise
   "
-  " vim-endwise didn't support <Plug>AutoPairsReturn
-  " when use <Plug>AutoPairsReturn will cause <Plug> wasn't expanded
+  " vim-endwise doesn't support <Plug>AutoPairsReturn
+  " when use <Plug>AutoPairsReturn will cause <Plug> isn't expanded
   "
-  " supertab didn't support <SID>AutoPairsReturn
+  " supertab doesn't support <SID>AutoPairsReturn
   " when use <SID>AutoPairsReturn  will cause Duplicated <CR>
   "
-  " and when load after vim-endwise will cause endwise duplicated closed. so always
+  " and when load after vim-endwise will cause endwise close incorrect. so always
   " load AutoPairs at last
   
   " Buffer level keys mapping
