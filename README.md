@@ -80,44 +80,44 @@ Features
 
 *  Fly Mode
 
-		input: if(a[3)
-		output: if(a[3])| (In Fly Mode)
-		output: if(a[3)]) (Without Fly Mode)
+        input: if(a[3)
+        output: if(a[3])| (In Fly Mode)
+        output: if(a[3)]) (Without Fly Mode)
 
-		input:
-		{
-			hello();|
-			world();
-		}
+        input:
+        {
+            hello();|
+            world();
+        }
 
-		(press } at |)
+        (press } at |)
 
-		output:
-		{
-			hello();
-			world();
-		}|
+        output:
+        {
+            hello();
+            world();
+        }|
 
-		(then press <M-b> at | to do backinsert)
-		output:
-		{
-			hello();}|
-			world();
-		}
+        (then press <M-b> at | to do backinsert)
+        output:
+        {
+            hello();}|
+            world();
+        }
 
-		See Fly Mode section for details
+        See Fly Mode section for details
 
 Fly Mode
 --------
 
-	Fly Mode will always force closed-pair jumping instead of inserting. only for ")", "}", "]"
-	If jumps in mistake, could use AutoPairsBackInsert(Default Key: <M-b>) to jump back and insert closed pair.
-	the most situation maybe want to insert single closed pair in the string, eg ")"
+    Fly Mode will always force closed-pair jumping instead of inserting. only for ")", "}", "]"
+    If jumps in mistake, could use AutoPairsBackInsert(Default Key: <M-b>) to jump back and insert closed pair.
+    the most situation maybe want to insert single closed pair in the string, eg ")"
 
-	Default Options:
+    Default Options:
 
-		let g:AutoPairsFlyMode = 1
-		let g:AutoPairsShortcutBackInsert = '<M-b>'
+        let g:AutoPairsFlyMode = 1
+        let g:AutoPairsShortcutBackInsert = '<M-b>'
 
 Shortcuts
 ---------
@@ -128,7 +128,7 @@ Shortcuts
         <M-p> : Toggle Autopairs (g:AutoPairsShortcutToggle)
         <M-e> : Fast Wrap (g:AutoPairsShortcutFastWrap)
         <M-n> : Jump to next closed pair (g:AutoPairsShortcutJump)
-		<M-b> : BackInsert
+        <M-b> : BackInsert
 
     If <M-p> <M-e> or <M-n> conflict with another keys or want to bind to another keys, add
 
@@ -189,17 +189,17 @@ Options
         Map <space> to insert a space after the opening character and before the closing one.
         execute 'inoremap <buffer> <silent> <CR> <C-R>=AutoPairsSpace()<CR>'
 
-*	g:AutoPairsFlyMode
+*   g:AutoPairsFlyMode
 
-		Default : 1
+        Default : 1
 
-		see FlyMode section for details.
+        see FlyMode section for details.
 
-*	g:AutoPairsShortcutBackInsert
+*   g:AutoPairsShortcutBackInsert
 
-		Default : <M-b>
+        Default : <M-b>
 
-		Work with FlyMode, insert the key at the Fly Mode jumped postion
+        Work with FlyMode, insert the key at the Fly Mode jumped postion
 
 TroubleShooting
 ---------------
