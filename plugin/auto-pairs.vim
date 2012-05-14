@@ -325,6 +325,7 @@ endfunction
 
 " Always silent the command
 inoremap <silent> <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
+imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
 
 " Global keys mapping
 " comptible with other plugin
@@ -335,7 +336,7 @@ if g:AutoPairsMapCR
   endif
 
   if old_cr !~ 'AutoPairsReturn'
-    execute 'imap <CR> '.old_cr.'<SID>AutoPairsReturn'
+    execute 'imap <CR> '.old_cr.'<Plug>AutoPairsReturn'
   end
 endif
 
