@@ -62,7 +62,7 @@ if !exists('g:AutoPairsShortcutBackInsert')
 endif
 
 
-" Will auto generated {']' => 1, ..., '}' => 1}in initialize.
+" Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
 let g:AutoPairsClosedPairs = {}
 
 
@@ -282,7 +282,7 @@ function! AutoPairsInit()
     if open != close
       call AutoPairsMap(close)
     end
-    let g:AutoPairsClosedPairs[close] = 1
+    let g:AutoPairsClosedPairs[close] = open
   endfor
 
   " Still use <buffer> level mapping for <BS> <SPACE>
@@ -318,26 +318,36 @@ endfunction
 function! AutoPairsForceInit()
   if exists('b:autopairs_loaded')
     return
-  else
-    call AutoPairsInit()
+  end
+  " for auto-pairs starts with 'a', so the priority is higher than supertab and vim-endwise
+  "
+  " vim-endwise didn't support <Plug>AutoPairsReturn
+  " when use <Plug>AutoPairsReturn will cause <Plug> wasn't expanded
+  "
+  " supertab didn't support <SID>AutoPairsReturn
+  " when use <SID>AutoPairsReturn  will cause Duplicated <CR>
+  "
+  " and when load after vim-endwise will cause endwise duplicated closed. so always
+  " load AutoPairs at last
+  
+  " Buffer level keys mapping
+  " comptible with other plugin
+  if g:AutoPairsMapCR
+    let old_cr = maparg('<CR>', 'i')
+    if old_cr == ''
+      let old_cr = '<CR>'
+    endif
+
+    if old_cr !~ 'AutoPairsReturn'
+      execute 'imap <buffer> <CR> '.old_cr.'<SID>AutoPairsReturn'
+    end
   endif
+  call AutoPairsInit()
 endfunction
 
 " Always silent the command
 inoremap <silent> <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
 imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
 
-" Global keys mapping
-" comptible with other plugin
-if g:AutoPairsMapCR
-  let old_cr = maparg('<CR>', 'i')
-  if old_cr == ''
-    let old_cr = '<CR>'
-  endif
-
-  if old_cr !~ 'AutoPairsReturn'
-    execute 'imap <CR> '.old_cr.'<Plug>AutoPairsReturn'
-  end
-endif
 
 au BufEnter * :call AutoPairsForceInit()
