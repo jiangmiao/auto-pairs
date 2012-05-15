@@ -290,11 +290,11 @@ function! AutoPairsInit()
 
   " Still use <buffer> level mapping for <BS> <SPACE>
   if g:AutoPairsMapBS
-    execute 'inoremap <buffer> <silent> <expr> <BS> AutoPairsDelete()'
+    execute 'inoremap <buffer> <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
   end
 
   if g:AutoPairsMapSpace
-    execute 'inoremap <buffer> <silent> <expr> <SPACE> AutoPairsSpace()'
+    execute 'inoremap <buffer> <silent> <SPACE> <C-R>=AutoPairsSpace()<CR>'
   end
 
   if g:AutoPairsShortcutFastWrap != ''
