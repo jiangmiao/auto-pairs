@@ -290,6 +290,7 @@ function! AutoPairsInit()
 
   " Still use <buffer> level mapping for <BS> <SPACE>
   if g:AutoPairsMapBS
+    " Use <C-R> instead of <expr> for issue #14 sometimes press BS output strange words
     execute 'inoremap <buffer> <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
   end
 
