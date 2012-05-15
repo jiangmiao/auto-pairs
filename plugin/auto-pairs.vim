@@ -352,7 +352,10 @@ function! AutoPairsForceInit()
     endif
 
     if old_cr !~ 'AutoPairsReturn'
-      execute 'imap <buffer> <CR> '.old_cr.'<SID>AutoPairsReturn'
+      " generally speaking, <silent> should not be here because every plugin
+      " has there own silent solution. but for some plugin which wasn't double silent 
+      " mapping, when maparg expand the map will lose the silent info, so <silent> always.
+      execute 'imap <buffer> <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
     end
   endif
   call AutoPairsInit()
