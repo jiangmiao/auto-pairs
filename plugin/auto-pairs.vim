@@ -1,8 +1,8 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
-" Last Change:  2012-05-15
-" Version: 1.2.1
+" Last Change:  2012-05-16
+" Version: 1.2.2
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
 
@@ -53,7 +53,7 @@ endif
 " Fly mode will for closed pair to jump to closed pair instead of insert.
 " also support AutoPairsBackInsert to insert pairs where jumped.
 if !exists('g:AutoPairsFlyMode')
-  let g:AutoPairsFlyMode = 1
+  let g:AutoPairsFlyMode = 0
 endif
 
 " Work with Fly Mode, insert pair where jumped

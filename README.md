@@ -109,15 +109,20 @@ Features
 
 Fly Mode
 --------
+Fly Mode will always force closed-pair jumping instead of inserting. only for ")", "}", "]"
 
-    Fly Mode will always force closed-pair jumping instead of inserting. only for ")", "}", "]"
-    If jumps in mistake, could use AutoPairsBackInsert(Default Key: <M-b>) to jump back and insert closed pair.
-    the most situation maybe want to insert single closed pair in the string, eg ")"
+If jumps in mistake, could use AutoPairsBackInsert(Default Key: <M-b>) to jump back and insert closed pair.
 
-    Default Options:
+the most situation maybe want to insert single closed pair in the string, eg ")"
 
-        let g:AutoPairsFlyMode = 1
-        let g:AutoPairsShortcutBackInsert = '<M-b>'
+Fly Mode is DISABLED by default.
+
+add **let g:AutoPairsFlyMode = 1** .vimrc to turn it on
+
+Default Options:
+
+    let g:AutoPairsFlyMode = 0
+    let g:AutoPairsShortcutBackInsert = '<M-b>'
 
 Shortcuts
 ---------
@@ -191,8 +196,9 @@ Options
 
 *   g:AutoPairsFlyMode
 
-        Default : 1
+        Default : 0
 
+        set it to 1 to enable FlyMode.
         see FlyMode section for details.
 
 *   g:AutoPairsShortcutBackInsert
