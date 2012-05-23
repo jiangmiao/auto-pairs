@@ -184,34 +184,62 @@ endfunction
 function! AutoPairsJump()
   call search('["\]'')}]','W')
 endfunction
+" string_chunk cannot use standalone
+let s:string_chunk = '\v%(\\\_.|[^\1]|[\r\n]){-}'
+let s:ss_pattern = '\v''' . s:string_chunk . ''''
+let s:ds_pattern = '\v"'  . s:string_chunk . '"'
+
+func! s:RegexpQuote(str)
+  return substitute(a:str, '\v[\[\{\(\<\>\)\}\]]', '\\&', 'g')
+endf
+
+func! s:RegexpQuoteInSquare(str)
+  return substitute(a:str, '\v[\[\]]', '\\&', 'g')
+endf
+
+" Search next open or close pair
+func! s:FormatChunk(open, close)
+  let open = s:RegexpQuote(a:open)
+  let close = s:RegexpQuote(a:close)
+  let open2 = s:RegexpQuoteInSquare(a:open)
+  let close2 = s:RegexpQuoteInSquare(a:close)
+  if open == close
+    return '\v'.open.s:string_chunk.close
+  else
+    return '\v%(' . s:ss_pattern . '|' . s:ds_pattern . '|' . '[^'.open2.close2.']|[\r\n]' . '){-}(['.open2.close2.'])'
+  end
+endf
 
 " Fast wrap the word in brackets
 function! AutoPairsFastWrap()
   let line = getline('.')
   let current_char = line[col('.')-1]
   let next_char = line[col('.')]
-
-  " Ignore EOL
-  if col('.') == col('$')
-    return ''
-  end
-  
-  normal! x
-  if next_char =~ '\s'
-    call search('\S', 'W')
-    let next_char = getline('.')[col('.')-1]
+  let open_pair_pattern = '\v[({\[''"]'
+  let at_end = col('.') >= col('$') - 1
+  normal x
+  " Skip blank
+  if next_char =~ '\v\s' || at_end
+    call search('\v\S', 'W')
+    let line = getline('.')
+    let next_char = line[col('.')-1]
   end
 
-  if has_key(g:AutoExtraPairs, next_char)
-    let close = g:AutoExtraPairs[next_char]
-    call search(close, 'W')
-    return "\<RIGHT>".current_char."\<LEFT>"
-  else
-    if next_char =~ '\w'
-      execute "normal! he"
+  if has_key(g:AutoPairs, next_char)
+    let followed_open_pair = next_char
+    let inputed_close_pair = current_char
+    let followed_close_pair = g:AutoPairs[next_char]
+    if followed_close_pair != followed_open_pair
+      " TODO replace system searchpair to skip string and nested pair.
+      " eg: (|){"hello}world"} will transform to ({"hello})world"}
+      call searchpair('\V'.followed_open_pair, '', '\V'.followed_close_pair, 'W')
+    else
+      call search(s:FormatChunk(followed_open_pair, followed_close_pair), 'We')
     end
-    execute "normal! a".current_char
-    return ""
+    return "\<RIGHT>".inputed_close_pair."\<LEFT>"
+  else
+    normal e
+    return "\<RIGHT>".current_char."\<LEFT>"
   end
 endfunction
 

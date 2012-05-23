@@ -53,8 +53,15 @@ Features
 
 *   Fast Wrap
 
-        input: |'hello' (press (<M-e> at|)
+        input: |'hello' (press (<M-e> at |)
         output: ('hello')
+
+		wrap string, only support c style string
+		input: |'h\\el\'lo' (press (<M-e> at |)
+		output ('h\\ello\'')
+
+		input: |[foo, bar()] (press (<M-e> at |)
+		output: ([foo, bar()])
 
 *   Quick jump to closed pair.
 
