@@ -1,8 +1,8 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
-" Last Change:  2012-05-16
-" Version: 1.2.2
+" Last Change:  2012-07-05
+" Version: 1.2.3
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
 
@@ -378,6 +378,14 @@ function! AutoPairsForceInit()
       let old_cr = '<CR>'
     else
       let old_cr = s:ExpandMap(old_cr)
+    endif
+
+    " compatible with clang_complete
+    " https://github.com/jiangmiao/auto-pairs/issues/18
+    let pattern = '<SNR>\d\+_HandlePossibleSelectionEnter()'
+    if old_cr =~ pattern
+      execute 'imap <expr> <script> <Plug>AutoPairsClangCompleteCR ' . matchstr(old_cr, pattern)
+      let old_cr = substitute(old_cr, pattern , '<Plug>AutoPairsClangCompleteCR', '')
     endif
 
     if old_cr !~ 'AutoPairsReturn'
