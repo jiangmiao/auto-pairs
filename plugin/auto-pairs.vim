@@ -1,7 +1,7 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
-" Last Change:  2012-07-05
+" Last Change:  2012-07-06
 " Version: 1.2.3
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
@@ -384,15 +384,16 @@ function! AutoPairsForceInit()
     " https://github.com/jiangmiao/auto-pairs/issues/18
     let pattern = '<SNR>\d\+_HandlePossibleSelectionEnter()'
     if old_cr =~ pattern
-      execute 'imap <expr> <script> <Plug>AutoPairsClangCompleteCR ' . matchstr(old_cr, pattern)
-      let old_cr = substitute(old_cr, pattern , '<Plug>AutoPairsClangCompleteCR', '')
+      execute 'imap <expr> <script> <SID>AutoPairsClangCompleteCR ' . matchstr(old_cr, pattern)
+      let old_cr = substitute(old_cr, pattern , '<SID>AutoPairsClangCompleteCR', '')
     endif
 
     if old_cr !~ 'AutoPairsReturn'
       " generally speaking, <silent> should not be here because every plugin
       " has there own silent solution. but for some plugin which wasn't double silent 
       " mapping, when maparg expand the map will lose the silent info, so <silent> always.
-      execute 'imap <buffer> <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
+      " use inoremap for neocomplcache
+      execute 'inoremap <script> <buffer> <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
     end
   endif
   call AutoPairsInit()
