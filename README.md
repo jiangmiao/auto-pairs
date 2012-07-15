@@ -56,12 +56,12 @@ Features
         input: |'hello' (press (<M-e> at |)
         output: ('hello')
 
-		wrap string, only support c style string
-		input: |'h\\el\'lo' (press (<M-e> at |)
-		output ('h\\ello\'')
+        wrap string, only support c style string
+        input: |'h\\el\'lo' (press (<M-e> at |)
+        output ('h\\ello\'')
 
-		input: |[foo, bar()] (press (<M-e> at |)
-		output: ([foo, bar()])
+        input: |[foo, bar()] (press (<M-e> at |)
+        output: ([foo, bar()])
 
 *   Quick jump to closed pair.
 
@@ -234,6 +234,23 @@ TroubleShooting
     3. use DEL or <C-O>x to delete the character insert by plugin.
 
 
+Known Issues
+-----------------------
+There are the issues I cannot fix.
+
+Compatible with Vimwiki - [issue #19](https://github.com/jiangmiao/auto-pairs/issues/19)
+
+    Description: When works with vimwiki `<CR>` will output `<SNR>xx_CR()`
+    Reason: vimwiki uses `<expr>` on mapping `<CR>` that auto-pairs cannot expanding.
+    Solution: add `let g:AutoPairsMapCR = 0` to .vimrc to disable `<CR>` mapping.
+
+Breaks '.' - [issue #3](https://github.com/jiangmiao/auto-pairs/issues/3)
+
+    Description: After entering insert mode and inputing `[hello` then leave insert mode by `<ESC>`, press '.' will insert 'hello' instead of '[hello]'.
+    Reason: `[` actually equals `[]\<LEFT>` and \<LEFT> will break '.'
+    Solution: none
+
 Contributors
 ------------
 * [camthompson](https://github.com/camthompson)
+
