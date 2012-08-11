@@ -246,7 +246,8 @@ Compatible with Vimwiki - [issue #19](https://github.com/jiangmiao/auto-pairs/is
 
 Breaks '.' - [issue #3](https://github.com/jiangmiao/auto-pairs/issues/3)
 
-    Description: After entering insert mode and inputing `[hello` then leave insert mode by `<ESC>`, press '.' will insert 'hello' instead of '[hello]'.
+    Description: After entering insert mode and inputing `[hello` then leave insert
+                 mode by `<ESC>`. press '.' will insert 'hello' instead of '[hello]'.
     Reason: `[` actually equals `[]\<LEFT>` and \<LEFT> will break '.'
     Solution: none
 
