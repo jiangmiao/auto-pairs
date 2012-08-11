@@ -267,8 +267,8 @@ function! AutoPairsReturn()
   let cmd = ''
   let cur_char = line[col('.')-1]
   if has_key(g:AutoPairs, prev_char) && g:AutoPairs[prev_char] == cur_char
-    if g:AutoPairsCenterLine && winline() * 1.5 >= winheight(0)
-      let cmd = " \<C-O>zz\<ESC>cl"
+    if g:AutoPairsCenterLine && winline() * 3 >= winheight(0) * 2
+      let cmd = " \<C-O>zz\<BS>"
     end
     " conflict with javascript and coffee
     " javascript   need   indent new line
