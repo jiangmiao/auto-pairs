@@ -261,6 +261,9 @@ function! AutoPairsToggle()
 endfunction
 
 function! AutoPairsReturn()
+  if b:autopairs_enabled == 0
+    return ''
+  end
   let line = getline('.')
   let pline = getline(line('.')-1)
   let prev_char = pline[strlen(pline)-1]
@@ -268,7 +271,10 @@ function! AutoPairsReturn()
   let cur_char = line[col('.')-1]
   if has_key(g:AutoPairs, prev_char) && g:AutoPairs[prev_char] == cur_char
     if g:AutoPairsCenterLine && winline() * 3 >= winheight(0) * 2
-      let cmd = " \<C-O>zz\<BS>"
+      " Use \<BS> instead of \<ESC>cl will cause the placeholder deleted
+      " incorrect. because <C-O>zz won't leave Normal mode.
+      " Use \<DEL> is a bit wierd. the character before cursor need to be deleted.
+      let cmd = " \<C-O>zz\<ESC>cl"
     end
     " conflict with javascript and coffee
     " javascript   need   indent new line
