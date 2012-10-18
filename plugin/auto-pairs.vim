@@ -281,6 +281,13 @@ function! AutoPairsReturn()
       " Use \<DEL> is a bit wierd. the character before cursor need to be deleted.
       let cmd = " \<C-O>zz\<ESC>cl"
     end
+
+    " If user has set equalprg, then avoid call =
+    " https://github.com/jiangmiao/auto-pairs/issues/24
+    if &equalprg != ''
+      return "\<ESC>O".cmd
+    endif
+
     " conflict with javascript and coffee
     " javascript   need   indent new line
     " coffeescript forbid indent new line
