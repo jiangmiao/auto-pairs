@@ -251,7 +251,6 @@ Compatible with viki - [issue #25](https://github.com/jiangmiao/auto-pairs/issue
     Solution A: add `autocmd filetype viki inoremap <buffer> <silent> <CR> <C-R>=viki#ExprMarkInexistentInElement('ParagraphVisible',"\n")<CR><C-R>=AutoPairsReturn()<CR>` to .vimrc
                 It will make viki and auto-pairs works together.
     Solution B: add `let g:AutoPairsMapCR = 0` to .vimrc to disable `<CR>` mapping.
-                It will auto-pairs will no remap '<CR>'
     Remarks: Solution A need NOT add `let g:AutoPairsMapCR = 0` to .vimrc, if Solution A still cannot work, then have to use Solution B to disable auto-pairs `<CR>`.
 
 Breaks '.' - [issue #3](https://github.com/jiangmiao/auto-pairs/issues/3)
