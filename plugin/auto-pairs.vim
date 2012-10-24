@@ -282,7 +282,7 @@ function! AutoPairsReturn()
       let cmd = " \<C-O>zz\<ESC>cl"
     end
 
-    " If user has set equalprg, then avoid call =
+    " If equalprg has been set, then avoid call =
     " https://github.com/jiangmiao/auto-pairs/issues/24
     if &equalprg != ''
       return "\<ESC>O".cmd
