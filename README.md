@@ -248,9 +248,11 @@ Compatible with viki - [issue #25](https://github.com/jiangmiao/auto-pairs/issue
     
     Description: When works with viki `<CR>` will output viki#ExprMarkInexistentInElement('ParagraphVisible','<CR>')
     Reason: viki uses `<expr>` on mapping `<CR>` that auto-pairs cannot expanding.
-    Solution A: add `let g:AutoPairsMapCR = 0` to .vimrc to disable `<CR>` mapping.
-    Solution B: add `autocmd filetype viki inoremap <buffer> <silent> <CR> <C-R>=viki#ExprMarkInexistentInElement('ParagraphVisible',"\n")<CR><C-R>=AutoPairsReturn()<CR>` to .vimrc
-    Remarks: Solution B need NOT add `let g:AutoPairsMapCR = 0` to .vimrc, if still cannot work for Solution B, then have to use Solution A to disable auto-pairs `<CR>`.
+    Solution A: add `autocmd filetype viki inoremap <buffer> <silent> <CR> <C-R>=viki#ExprMarkInexistentInElement('ParagraphVisible',"\n")<CR><C-R>=AutoPairsReturn()<CR>` to .vimrc
+                It will make viki and auto-pairs works together.
+    Solution B: add `let g:AutoPairsMapCR = 0` to .vimrc to disable `<CR>` mapping.
+                It will auto-pairs will no remap '<CR>'
+    Remarks: Solution A need NOT add `let g:AutoPairsMapCR = 0` to .vimrc, if Solution A still cannot work, then have to use Solution B to disable auto-pairs `<CR>`.
 
 Breaks '.' - [issue #3](https://github.com/jiangmiao/auto-pairs/issues/3)
 
