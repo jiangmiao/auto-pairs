@@ -130,6 +130,7 @@ Default Options:
 
     let g:AutoPairsFlyMode = 0
     let g:AutoPairsShortcutBackInsert = '<M-b>'
+    let g:AutoPairsSkipBeforeWord = 0
 
 Shortcuts
 ---------
@@ -213,6 +214,12 @@ Options
         Default : <M-b>
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
+
+*   g:AutoPairsSkipBeforeWord
+
+        Default : 0
+
+        Set to 1 : While not in FlyMode, skip inserting a pair when directly before a word-character.
 
 TroubleShooting
 ---------------
