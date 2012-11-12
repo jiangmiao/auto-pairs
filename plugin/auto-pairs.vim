@@ -50,6 +50,11 @@ if !exists('g:AutoPairsShortcutJump')
   let g:AutoPairsShortcutJump = '<M-n>'
 endif
 
+" Skip auto-pairing if the cursor is directly before a word-character
+if !exists('g:AutoPairsSkipBeforeWord')
+  let g:AutoPairsSkipBeforeWord = 0
+end
+
 " Fly mode will for closed pair to jump to closed pair instead of insert.
 " also support AutoPairsBackInsert to insert pairs where jumped.
 if !exists('g:AutoPairsFlyMode')
@@ -88,6 +93,11 @@ function! AutoPairsInsert(key)
   if prev_char == '\'
     return a:key
   end
+
+  " Ignore auto open if next charater is a word-character (optional)
+  if !g:AutoPairsFlyMode && g:AutoPairsSkipBeforeWord == 1 && next_char =~ '\v\w'
+    return a:key
+  endif
 
   " The key is difference open-pair, then it means only for ) ] } by default
   if !has_key(g:AutoPairs, a:key)
