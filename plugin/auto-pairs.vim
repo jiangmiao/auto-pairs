@@ -153,6 +153,10 @@ function! AutoPairsInsert(key)
 endfunction
 
 function! AutoPairsDelete()
+  if !b:autopairs_enabled
+    return a:key
+  end
+
   let line = getline('.')
   let pos = col('.') - 1
   let current_char = get(split(strpart(line, pos), '\zs'), 0, '')
@@ -174,7 +178,7 @@ function! AutoPairsDelete()
     if match(line,'^\s*'.close, col('.')-1) != -1
       let space = matchstr(line, '^\s*', col('.')-1)
       return "\<BS>". repeat("\<DEL>", len(space)+1)
-    else
+    elseif match(line, '^\s*$', col('.')-1) != -1
       let nline = getline(line('.')+1)
       if nline =~ '^\s*'.close
         let space = matchstr(nline, '^\s*')
