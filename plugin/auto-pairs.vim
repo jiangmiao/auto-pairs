@@ -154,7 +154,7 @@ endfunction
 
 function! AutoPairsDelete()
   if !b:autopairs_enabled
-    return a:key
+    return "\<BS>"
   end
 
   let line = getline('.')
