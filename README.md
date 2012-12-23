@@ -154,6 +154,12 @@ Options
 
         Default: {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 
+*   b:AutoPairs
+
+        Default: g:AutoPairs
+
+        Buffer level pairs set.
+
 *   g:AutoPairsShortcutToggle
 
         Default: '<M-p>'
@@ -213,6 +219,16 @@ Options
         Default : <M-b>
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
+
+Buffer Level Pairs Setting
+--------------------------
+
+Set b:AutoPairs before BufEnter
+
+eg:
+
+    " When the filetype is FILETYPE then make AutoPairs only match for parenthesis
+    au Filetype FILETYPE let b:AutoPairs = {"(": ")"}
 
 TroubleShooting
 ---------------

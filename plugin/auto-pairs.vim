@@ -19,9 +19,6 @@ if !exists('g:AutoPairsParens')
   let g:AutoPairsParens = {'(':')', '[':']', '{':'}'}
 end
 
-let g:AutoExtraPairs = copy(g:AutoPairs)
-let g:AutoExtraPairs['<'] = '>'
-
 if !exists('g:AutoPairsMapBS')
   let g:AutoPairsMapBS = 1
 end
@@ -90,7 +87,7 @@ function! AutoPairsInsert(key)
   end
 
   " The key is difference open-pair, then it means only for ) ] } by default
-  if !has_key(g:AutoPairs, a:key)
+  if !has_key(b:AutoPairs, a:key)
     let b:autopairs_saved_pair = [a:key, getpos('.')]
 
     " Skip the character if current character is the same as input
@@ -116,7 +113,7 @@ function! AutoPairsInsert(key)
     endif
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
-    if g:AutoPairsFlyMode && has_key(g:AutoPairsClosedPairs, a:key)
+    if g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
       if search(a:key, 'W')
         return "\<Right>"
       endif
@@ -127,7 +124,7 @@ function! AutoPairsInsert(key)
   end
 
   let open = a:key
-  let close = g:AutoPairs[open]
+  let close = b:AutoPairs[open]
 
   if current_char == close && open == close
     return "\<Right>"
@@ -169,12 +166,12 @@ function! AutoPairsDelete()
   end
 
   " Delete last two spaces in parens, work with MapSpace
-  if has_key(g:AutoPairs, pprev_char) && prev_char == ' ' && current_char == ' '
+  if has_key(b:AutoPairs, pprev_char) && prev_char == ' ' && current_char == ' '
     return "\<BS>\<DEL>"
   endif
 
-  if has_key(g:AutoPairs, prev_char) 
-    let close = g:AutoPairs[prev_char]
+  if has_key(b:AutoPairs, prev_char) 
+    let close = b:AutoPairs[prev_char]
     if match(line,'^\s*'.close, col('.')-1) != -1
       let space = matchstr(line, '^\s*', col('.')-1)
       return "\<BS>". repeat("\<DEL>", len(space)+1)
@@ -234,10 +231,10 @@ function! AutoPairsFastWrap()
     let next_char = line[col('.')-1]
   end
 
-  if has_key(g:AutoPairs, next_char)
+  if has_key(b:AutoPairs, next_char)
     let followed_open_pair = next_char
     let inputed_close_pair = current_char
-    let followed_close_pair = g:AutoPairs[next_char]
+    let followed_close_pair = b:AutoPairs[next_char]
     if followed_close_pair != followed_open_pair
       " TODO replace system searchpair to skip string and nested pair.
       " eg: (|){"hello}world"} will transform to ({"hello})world"}
@@ -278,7 +275,7 @@ function! AutoPairsReturn()
   let prev_char = pline[strlen(pline)-1]
   let cmd = ''
   let cur_char = line[col('.')-1]
-  if has_key(g:AutoPairs, prev_char) && g:AutoPairs[prev_char] == cur_char
+  if has_key(b:AutoPairs, prev_char) && b:AutoPairs[prev_char] == cur_char
     if g:AutoPairsCenterLine && winline() * 3 >= winheight(0) * 2
       " Use \<BS> instead of \<ESC>cl will cause the placeholder deleted
       " incorrect. because <C-O>zz won't leave Normal mode.
@@ -328,14 +325,19 @@ endfunction
 function! AutoPairsInit()
   let b:autopairs_loaded  = 1
   let b:autopairs_enabled = 1
+  let b:AutoPairsClosedPairs = {}
+
+  if !exists('b:AutoPairs')
+    let b:AutoPairs = g:AutoPairs
+  end
 
   " buffer level map pairs keys
-  for [open, close] in items(g:AutoPairs)
+  for [open, close] in items(b:AutoPairs)
     call AutoPairsMap(open)
     if open != close
       call AutoPairsMap(close)
     end
-    let g:AutoPairsClosedPairs[close] = open
+    let b:AutoPairsClosedPairs[close] = open
   endfor
 
   " Still use <buffer> level mapping for <BS> <SPACE>
@@ -377,10 +379,11 @@ function! s:ExpandMap(map)
   return map
 endfunction
 
-function! AutoPairsForceInit()
+function! AutoPairsTryInit()
   if exists('b:autopairs_loaded')
     return
   end
+
   " for auto-pairs starts with 'a', so the priority is higher than supertab and vim-endwise
   "
   " vim-endwise doesn't support <Plug>AutoPairsReturn
@@ -426,4 +429,4 @@ inoremap <silent> <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
 imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
 
 
-au BufEnter * :call AutoPairsForceInit()
+au BufEnter * :call AutoPairsTryInit()
