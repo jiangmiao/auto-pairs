@@ -142,7 +142,7 @@ function! AutoPairsInsert(key)
     let pprev_char = line[col('.')-3]
     if pprev_char == open && prev_char == open
       " Double pair found
-      return a:key
+      return a:key."\<CR>".repeat(a:key,3)."\<Up>\<ESC>o"
     end
   end
 
