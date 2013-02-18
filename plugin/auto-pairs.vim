@@ -273,9 +273,14 @@ function! AutoPairsFastWrap()
 endfunction
 
 function! AutoPairsMap(key)
-  let escaped_key = substitute(a:key, "'", "''", 'g')
+  " | is special key which separate map command from text
+  let key = a:key
+  if key == '|'
+    let key = '<BAR>'
+  end
+  let escaped_key = substitute(key, "'", "''", 'g')
   " use expr will cause search() doesn't work
-  execute 'inoremap <buffer> <silent> '.a:key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
+  execute 'inoremap <buffer> <silent> '.key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
 endfunction
 
 function! AutoPairsToggle()
