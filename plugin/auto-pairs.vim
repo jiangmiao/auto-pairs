@@ -267,7 +267,7 @@ function! AutoPairsFastWrap()
     end
     return "\<RIGHT>".inputed_close_pair."\<LEFT>"
   else
-    normal e
+    normal he
     return "\<RIGHT>".current_char."\<LEFT>"
   end
 endfunction
