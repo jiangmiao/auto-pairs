@@ -74,10 +74,12 @@ function! AutoPairsInsert(key)
 
   let line = getline('.')
   let pos = col('.') - 1
-  let next_chars = split(strpart(line, pos), '\zs')
+  let before = strpart(line, 0, pos)
+  let after = strpart(line, pos)
+  let next_chars = split(after, '\zs')
   let current_char = get(next_chars, 0, '')
   let next_char = get(next_chars, 1, '')
-  let prev_chars = split(strpart(line, 0, pos), '\zs')
+  let prev_chars = split(before, '\zs')
   let prev_char = get(prev_chars, -1, '')
 
   let eol = 0
@@ -150,12 +152,23 @@ function! AutoPairsInsert(key)
     end
   end
 
+  let quotes_num = 0
+  " Ignore comment line for vim file
+  if &filetype == 'vim' && a:key == '"'
+    if before =~ '^\s*$'
+      return a:key
+    end
+    if before =~ '^\s*"'
+      let quotes_num = -1
+    end
+  end
+
   " Keep quote number is odd.
   " Because quotes should be matched in the same line in most of situation
   if g:AutoPairsSmartQuotes && open == close
-    " Remove \\ , \" \'
+    " Remove \\ \" \'
     let cleaned_line = substitute(line, '\v(\\.)', '', 'g')
-    let n = 0
+    let n = quotes_num
     let pos = 0
     while 1
       let pos = stridx(cleaned_line, open, pos)
