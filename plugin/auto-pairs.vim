@@ -58,6 +58,10 @@ if !exists('g:AutoPairsShortcutBackInsert')
   let g:AutoPairsShortcutBackInsert = '<M-b>'
 endif
 
+if !exists('g:AutoPairsSmartQuotes')
+  let g:AutoPairsSmartQuotes = 1
+endif
+
 
 " Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
 let g:AutoPairsClosedPairs = {}
@@ -119,7 +123,7 @@ function! AutoPairsInsert(key)
       endif
     endif
 
-    " Input directly if the key is not an open key
+    " Insert directly if the key is not an open key
     return a:key
   end
 
@@ -145,6 +149,26 @@ function! AutoPairsInsert(key)
       return repeat(a:key, 4) . repeat("\<LEFT>", 3)
     end
   end
+
+  " Keep quote number is odd.
+  " Because quotes should be matched in the same line in most of situation
+  if g:AutoPairsSmartQuotes && open == close
+    " Remove \\ , \" \'
+    let cleaned_line = substitute(line, '\v(\\.)', '', 'g')
+    let n = 0
+    let pos = 0
+    while 1
+      let pos = stridx(cleaned_line, open, pos)
+      if pos == -1
+        break
+      end
+      let n = n + 1
+      let pos = pos + 1
+    endwhile
+    if n % 2 == 1
+      return a:key
+    endif
+  endif
 
   return open.close."\<Left>"
 endfunction
