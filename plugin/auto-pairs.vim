@@ -238,6 +238,11 @@ function! AutoPairsDelete()
       " Delete (|__\n___)
       let nline = getline(line('.')+1)
       if nline =~ '^\s*'.close
+        if &filetype == 'vim' && prev_char == '"'
+          " Keep next line's comment
+          return "\<BS>"
+        end
+
         let space = matchstr(nline, '^\s*')
         return "\<BS>\<DEL>". repeat("\<DEL>", len(space)+1)
       end
