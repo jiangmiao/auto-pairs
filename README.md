@@ -6,6 +6,9 @@ Installation
 ------------
 copy plugin/auto-pairs.vim to ~/.vim/plugin
 
+or if you are using `pathogen`:
+```git clone git://github.com/jiangmiao/auto-pairs.git ~/.vim/bundle```
+
 Features
 --------
 *   Insert in pair
