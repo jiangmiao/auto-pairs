@@ -442,11 +442,10 @@ function! AutoPairsInit()
 
 endfunction
 
-function! s:ExpandMap(map)
+function! s:ExpandMap(map, sid)
   let map = a:map
-  if map =~ '<Plug>'
-    let map = substitute(map, '\(<Plug>\w\+\)', '\=maparg(submatch(1), "i")', 'g')
-  endif
+  let map = substitute(map, '\(<Plug>\w\+\)', '\=maparg(submatch(1), "i")', 'g')
+  let map = substitute(map, '<SID>', '<SNR>' . a:sid . '_', 'g')
   return map
 endfunction
 
@@ -469,26 +468,24 @@ function! AutoPairsTryInit()
   " Buffer level keys mapping
   " comptible with other plugin
   if g:AutoPairsMapCR
-    let old_cr = maparg('<CR>', 'i')
-    if old_cr == ''
-      let old_cr = '<CR>'
+    let info = maparg('<CR>', 'i', 0, 1)
+    if !empty(info)
+      let old_cr = info['rhs']
+      if old_cr !~ 'AutoPairsReturn'
+        let old_cr = s:ExpandMap(old_cr, info['sid'])
+        if info['expr']
+          " remap <expr> to <SID>OldCR to avoid mix expr and non-expr mode
+          let name = '<SID>AutoPairsOldCRWrapper'
+          execute 'inoremap <expr> <script> '. name . ' ' . old_cr
+          let old_cr = name
+        end
+      end
     else
-      let old_cr = s:ExpandMap(old_cr)
-    endif
-
-    " compatible with clang_complete
-    " https://github.com/jiangmiao/auto-pairs/issues/18
-    let pattern = '<SNR>\d\+_HandlePossibleSelectionEnter()'
-    if old_cr =~ pattern
-      execute 'imap <expr> <script> <SID>AutoPairsClangCompleteCR ' . matchstr(old_cr, pattern)
-      let old_cr = substitute(old_cr, pattern , '<SID>AutoPairsClangCompleteCR', '')
-    endif
+      let old_cr = '<CR>'
+    end
 
     if old_cr !~ 'AutoPairsReturn'
-      " generally speaking, <silent> should not be here because every plugin
-      " has there own silent solution. but for some plugin which wasn't double silent 
-      " mapping, when maparg expand the map will lose the silent info, so <silent> always.
-      " use inoremap for neocomplcache
+      " Alawys slient mapping
       execute 'inoremap <script> <buffer> <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
     end
   endif
