@@ -474,9 +474,9 @@ function! AutoPairsTryInit()
       if old_cr !~ 'AutoPairsReturn'
         let old_cr = s:ExpandMap(old_cr, info['sid'])
         if info['expr']
-          " remap <expr> to <SID>OldCR to avoid mix expr and non-expr mode
+          " remap <expr> to `name` to avoid mix expr and non-expr mode
           let name = '<SID>AutoPairsOldCRWrapper'
-          execute 'inoremap <expr> <script> '. name . ' ' . old_cr
+          execute 'inoremap <buffer> <expr> <script> '. name . ' ' . old_cr
           let old_cr = name
         end
       end
