@@ -478,7 +478,7 @@ function! AutoPairsTryInit()
         let old_cr = info['rhs']
         let old_cr = s:ExpandMap(old_cr)
         let old_cr = substitute(old_cr, '<SID>', '<SNR>' . info['sid'] . '_', 'g')
-        let is_expr = 1
+        let is_expr = info['expr']
         let wrapper_name = '<SID>AutoPairsOldCRWrapper73'
       endif
     else
@@ -491,7 +491,7 @@ function! AutoPairsTryInit()
         let is_expr = 0
       else
         let old_cr = s:ExpandMap(old_cr)
-        " old_cr contain (,I guess the old cr is in expr mode
+        " old_cr contain (, I guess the old cr is in expr mode
         let is_expr = old_cr  =~ '\V('
         let wrapper_name = '<SID>AutoPairsOldCRWrapper'
       end
