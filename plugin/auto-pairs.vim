@@ -442,10 +442,9 @@ function! AutoPairsInit()
 
 endfunction
 
-function! s:ExpandMap(map, sid)
+function! s:ExpandMap(map)
   let map = a:map
   let map = substitute(map, '\(<Plug>\w\+\)', '\=maparg(submatch(1), "i")', 'g')
-  let map = substitute(map, '<SID>', '<SNR>' . a:sid . '_', 'g')
   return map
 endfunction
 
@@ -468,23 +467,42 @@ function! AutoPairsTryInit()
   " Buffer level keys mapping
   " comptible with other plugin
   if g:AutoPairsMapCR
-    let info = maparg('<CR>', 'i', 0, 1)
-    if !empty(info)
-      let old_cr = info['rhs']
-      if old_cr !~ 'AutoPairsReturn'
-        let old_cr = s:ExpandMap(old_cr, info['sid'])
-        if info['expr']
-          " remap <expr> to `name` to avoid mix expr and non-expr mode
-          let name = '<SID>AutoPairsOldCRWrapper'
-          execute 'inoremap <buffer> <expr> <script> '. name . ' ' . old_cr
-          let old_cr = name
-        end
-      end
+    if v:version >= 703
+      " VIM 7.3 supports advancer maparg which could get <expr> info
+      " then auto-pairs could remap <CR> in any case.
+      let info = maparg('<CR>', 'i', 0, 1)
+      if empty(info)
+        let old_cr = '<CR>'
+        let is_expr = 0
+      else
+        let old_cr = info['rhs']
+        let old_cr = s:ExpandMap(old_cr)
+        let old_cr = substitute(old_cr, '<SID>', '<SNR>' . info['sid'] . '_', 'g')
+        let is_expr = 1
+        let wrapper_name = '<SID>AutoPairsOldCRWrapper73'
+      endif
     else
-      let old_cr = '<CR>'
+      " VIM version less than 7.3
+      " the mapping's <expr> info is lost, so guess it is expr or not, it's
+      " not accurate.
+      let old_cr = maparg('<CR>', 'i')
+      if old_cr == ''
+        let old_cr = '<CR>'
+        let is_expr = 0
+      else
+        let old_cr = s:ExpandMap(old_cr)
+        " old_cr contain (), I guess the old cr is in expr mode
+        let is_expr = old_cr  =~ '\V()'
+        let wrapper_name = '<SID>AutoPairsOldCRWrapper'
+      end
     end
 
     if old_cr !~ 'AutoPairsReturn'
+      if is_expr
+        " remap <expr> to `name` to avoid mix expr and non-expr mode
+        execute 'inoremap <buffer> <expr> <script> '. wrapper_name . ' ' . old_cr
+        let old_cr = wrapper_name
+      end
       " Alawys slient mapping
       execute 'inoremap <script> <buffer> <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
     end
