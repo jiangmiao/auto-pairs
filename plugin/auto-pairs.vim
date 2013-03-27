@@ -491,8 +491,8 @@ function! AutoPairsTryInit()
         let is_expr = 0
       else
         let old_cr = s:ExpandMap(old_cr)
-        " old_cr contain (), I guess the old cr is in expr mode
-        let is_expr = old_cr  =~ '\V()'
+        " old_cr contain (,I guess the old cr is in expr mode
+        let is_expr = old_cr  =~ '\V('
         let wrapper_name = '<SID>AutoPairsOldCRWrapper'
       end
     end
