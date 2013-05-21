@@ -419,7 +419,12 @@ function! AutoPairsInit()
   end
 
   if g:AutoPairsMapSpace
-    execute 'inoremap <buffer> <silent> <SPACE> <C-R>=AutoPairsSpace()<CR>'
+    " Try to respect abbreviations on a <SPACE>
+    let do_abbrev = ""
+    if v:version >= 703 && has("patch489")
+      let do_abbrev = "<C-]>"
+    endif
+    execute 'inoremap <buffer> <silent> <SPACE> '.do_abbrev.'<C-R>=AutoPairsSpace()<CR>'
   end
 
   if g:AutoPairsShortcutFastWrap != ''
