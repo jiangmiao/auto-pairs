@@ -498,7 +498,10 @@ function! AutoPairsTryInit()
       else
         let old_cr = s:ExpandMap(old_cr)
         " old_cr contain (, I guess the old cr is in expr mode
-        let is_expr = old_cr  =~ '\V(' && toupper(old_cr) !~ '\V<C-R>'
+        let is_expr = old_cr =~ '\V(' && toupper(old_cr) !~ '\V<C-R>'
+
+        " The old_cr start with " it must be in expr mode too
+        let is_expr = is_expr || old_cr =~ '\v^"'
         let wrapper_name = '<SID>AutoPairsOldCRWrapper'
       end
     end
