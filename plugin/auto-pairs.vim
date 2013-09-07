@@ -189,7 +189,11 @@ endfunction
 
 function! AutoPairsDelete()
   if !b:autopairs_enabled
-    return "\<BS>"
+    if pumvisible() == 1
+        return "\<C-y>\<BS>"
+    else
+        return "\<BS>"
+    endif
   end
 
   let line = getline('.')
@@ -200,12 +204,20 @@ function! AutoPairsDelete()
   let pprev_char = get(prev_chars, -2, '')
 
   if pprev_char == '\'
-    return "\<BS>"
+    if pumvisible() == 1
+        return "\<C-y>\<BS>"
+    else
+        return "\<BS>"
+    endif
   end
 
   " Delete last two spaces in parens, work with MapSpace
   if has_key(b:AutoPairs, pprev_char) && prev_char == ' ' && current_char == ' '
-    return "\<BS>\<DEL>"
+    if pumvisible() == 1
+        return "\<C-y>\<BS>\<DEL>"
+    else
+        return "\<BS>\<DEL>"
+    endif
   endif
 
   " Delete Repeated Pair eg: '''|''' [[|]] {{|}}
@@ -224,33 +236,53 @@ function! AutoPairsDelete()
     let before = strpart(line, pos-times, times)
     let after  = strpart(line, pos, times)
     if left == before && right == after
-      return repeat("\<BS>\<DEL>", times)
+      if pumvisible() == 1
+          return repeat("\<C-y>\<BS>\<DEL>", times)
+      else
+          return repeat("\<BS>\<DEL>", times)
+      endif
     end
   end
 
 
-  if has_key(b:AutoPairs, prev_char) 
+  if has_key(b:AutoPairs, prev_char)
     let close = b:AutoPairs[prev_char]
     if match(line,'^\s*'.close, col('.')-1) != -1
       " Delete (|___)
       let space = matchstr(line, '^\s*', col('.')-1)
-      return "\<BS>". repeat("\<DEL>", len(space)+1)
+      if pumvisible() == 1
+          return "\<C-y>\<BS>". repeat("\<DEL>", len(space)+1)
+      else
+          return "\<BS>". repeat("\<DEL>", len(space)+1)
+      endif
     elseif match(line, '^\s*$', col('.')-1) != -1
       " Delete (|__\n___)
       let nline = getline(line('.')+1)
       if nline =~ '^\s*'.close
         if &filetype == 'vim' && prev_char == '"'
           " Keep next line's comment
-          return "\<BS>"
+          if pumvisible() == 1
+              return "\<C-y>\<BS>"
+          else
+              return "\<BS>"
+          endif
         end
 
         let space = matchstr(nline, '^\s*')
-        return "\<BS>\<DEL>". repeat("\<DEL>", len(space)+1)
+        if pumvisible() == 1
+            return "\<C-y>\<BS>\<DEL>". repeat("\<DEL>", len(space)+1)
+        else
+            return "\<BS>\<DEL>". repeat("\<DEL>", len(space)+1)
+        endif
       end
     end
   end
 
-  return "\<BS>"
+  if pumvisible() == 1
+      return "\<C-y>\<BS>"
+  else
+      return "\<BS>"
+  endif
 endfunction
 
 function! AutoPairsJump()
@@ -467,9 +499,9 @@ function! AutoPairsTryInit()
   " supertab doesn't support <SID>AutoPairsReturn
   " when use <SID>AutoPairsReturn  will cause Duplicated <CR>
   "
-  " and when load after vim-endwise will cause unexpected endwise inserted. 
+  " and when load after vim-endwise will cause unexpected endwise inserted.
   " so always load AutoPairs at last
-  
+
   " Buffer level keys mapping
   " comptible with other plugin
   if g:AutoPairsMapCR
