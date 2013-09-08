@@ -189,11 +189,7 @@ endfunction
 
 function! AutoPairsDelete()
   if !b:autopairs_enabled
-    if pumvisible() == 1
-        return "\<C-y>\<BS>"
-    else
-        return "\<BS>"
-    endif
+    return AutoPairsCompatibleBS()
   end
 
   let line = getline('.')
@@ -204,20 +200,12 @@ function! AutoPairsDelete()
   let pprev_char = get(prev_chars, -2, '')
 
   if pprev_char == '\'
-    if pumvisible() == 1
-        return "\<C-y>\<BS>"
-    else
-        return "\<BS>"
-    endif
+    return AutoPairsCompatibleBS()
   end
 
   " Delete last two spaces in parens, work with MapSpace
   if has_key(b:AutoPairs, pprev_char) && prev_char == ' ' && current_char == ' '
-    if pumvisible() == 1
-        return "\<C-y>\<BS>\<DEL>"
-    else
-        return "\<BS>\<DEL>"
-    endif
+    return AutoPairsCompatibleBS() . "\<DEL>"
   endif
 
   " Delete Repeated Pair eg: '''|''' [[|]] {{|}}
@@ -236,11 +224,7 @@ function! AutoPairsDelete()
     let before = strpart(line, pos-times, times)
     let after  = strpart(line, pos, times)
     if left == before && right == after
-      if pumvisible() == 1
-          return repeat("\<C-y>\<BS>\<DEL>", times)
-      else
-          return repeat("\<BS>\<DEL>", times)
-      endif
+      return repeat(AutoPairsCompatibleBS() . "\<DEL>", times)
     end
   end
 
@@ -250,39 +234,23 @@ function! AutoPairsDelete()
     if match(line,'^\s*'.close, col('.')-1) != -1
       " Delete (|___)
       let space = matchstr(line, '^\s*', col('.')-1)
-      if pumvisible() == 1
-          return "\<C-y>\<BS>". repeat("\<DEL>", len(space)+1)
-      else
-          return "\<BS>". repeat("\<DEL>", len(space)+1)
-      endif
+      return AutoPairsCompatibleBS() . repeat("\<DEL>", len(space)+1)
     elseif match(line, '^\s*$', col('.')-1) != -1
       " Delete (|__\n___)
       let nline = getline(line('.')+1)
       if nline =~ '^\s*'.close
         if &filetype == 'vim' && prev_char == '"'
           " Keep next line's comment
-          if pumvisible() == 1
-              return "\<C-y>\<BS>"
-          else
-              return "\<BS>"
-          endif
+          return AutoPairsCompatibleBS()
         end
 
         let space = matchstr(nline, '^\s*')
-        if pumvisible() == 1
-            return "\<C-y>\<BS>\<DEL>". repeat("\<DEL>", len(space)+1)
-        else
-            return "\<BS>\<DEL>". repeat("\<DEL>", len(space)+1)
-        endif
+        return AutoPairsCompatibleBS() . "\<DEL>" . repeat("\<DEL>", len(space)+1)
       end
     end
   end
 
-  if pumvisible() == 1
-      return "\<C-y>\<BS>"
-  else
-      return "\<BS>"
-  endif
+  return AutoPairsCompatibleBS()
 endfunction
 
 function! AutoPairsJump()
@@ -550,6 +518,20 @@ function! AutoPairsTryInit()
   endif
   call AutoPairsInit()
 endfunction
+
+" Add ycm compatible <BS>
+if !exists("g:loaded_youcompleteme") || g:loaded_youcompleteme == 0
+  function! AutoPairsCompatibleBS()
+    return "\<BS>"
+  endfunction
+else
+  function! AutoPairsCompatibleBS()
+    if pumvisible() == 1
+      return "\<C-y>\<BS>"
+    endif
+    return "\<BS>"
+  endfunction
+endif
 
 " Always silent the command
 inoremap <silent> <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
