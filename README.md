@@ -159,7 +159,7 @@ Shortcuts
 
     If <M-p> <M-e> or <M-n> conflict with another keys or want to bind to another keys, add
 
-        let g:AutoPairShortcutToggle = '<another key>'
+        let g:AutoPairsShortcutToggle = '<another key>'
 
     to .vimrc, if the key is empty string '', then the shortcut will be disabled.
 
