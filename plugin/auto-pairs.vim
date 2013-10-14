@@ -473,7 +473,7 @@ function! AutoPairsTryInit()
   " Buffer level keys mapping
   " comptible with other plugin
   if g:AutoPairsMapCR
-    if v:version >= 703 && has('patch32')
+    if v:version == 703 && has('patch32') || v:version > 703
       " VIM 7.3 supports advancer maparg which could get <expr> info
       " then auto-pairs could remap <CR> in any case.
       let info = maparg('<CR>', 'i', 0, 1)
@@ -500,7 +500,7 @@ function! AutoPairsTryInit()
         " old_cr contain (, I guess the old cr is in expr mode
         let is_expr = old_cr =~ '\V(' && toupper(old_cr) !~ '\V<C-R>'
 
-        " The old_cr start with " it must be in expr mode too
+        " The old_cr start with " it must be in expr mode
         let is_expr = is_expr || old_cr =~ '\v^"'
         let wrapper_name = '<SID>AutoPairsOldCRWrapper'
       end
