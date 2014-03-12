@@ -24,6 +24,10 @@ if !exists('g:AutoPairsMapBS')
   let g:AutoPairsMapBS = 1
 end
 
+if !exists('g:AutoPairsNormalJump')
+  let g:AutoPairsNormalJump = 1
+end
+
 if !exists('g:AutoPairsMapCR')
   let g:AutoPairsMapCR = 1
 end
@@ -443,7 +447,10 @@ function! AutoPairsInit()
 
   if g:AutoPairsShortcutJump != ''
     execute 'inoremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' <ESC>:call AutoPairsJump()<CR>a'
-    execute 'noremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' :call AutoPairsJump()<CR>'
+
+    if g:AutoPairsNormalJump == 1
+        execute 'noremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' :call AutoPairsJump()<CR>'
+    end
   end
 
 endfunction
