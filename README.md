@@ -229,6 +229,14 @@ Options
         set it to 1 to enable FlyMode.
         see FlyMode section for details.
 
+*   g:AutoPairsMultilineClose
+
+        Default : 1
+
+        When you press the key for the closing pair (e.g. `)`) it jumps past it.
+        If set to 1, then it'll jump to the next line, if there is only whitespace.
+        If set to 0, then it'll only jump to a closing pair on the same line.
+
 *   g:AutoPairsShortcutBackInsert
 
         Default : <M-b>
