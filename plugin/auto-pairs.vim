@@ -48,6 +48,10 @@ if !exists('g:AutoPairsShortcutJump')
   let g:AutoPairsShortcutJump = '<M-n>'
 endif
 
+if !exists('g:AutoPairsAnnoyingMode')
+  let g:AutoPairsAnnoyingMode = '0'
+endif
+
 " Fly mode will for closed pair to jump to closed pair instead of insert.
 " also support AutoPairsBackInsert to insert pairs where jumped.
 if !exists('g:AutoPairsFlyMode')
