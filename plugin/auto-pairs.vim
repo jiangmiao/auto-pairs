@@ -114,7 +114,11 @@ function! AutoPairsInsert(key)
         let next_line = getline(nextnonblank(next_lineno))
         let next_char = matchstr(next_line, '\s*\zs.')
         if next_char == a:key
-          return "\<ESC>e^a"
+          if g:AutoPairsAnnoyingMode
+            return "\<ESC>e^a"
+          else
+            return a:key
+          end
         endif
       endif
     endif
@@ -525,3 +529,4 @@ imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
 
 
 au BufEnter * :call AutoPairsTryInit()
+
