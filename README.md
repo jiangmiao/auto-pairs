@@ -19,7 +19,7 @@ Features
 
 *   Delete in pair
 
-        input: foo[<BS>
+        input: foo[<BS>]
         output: foo
 
 *   Insert new indented line after Return
