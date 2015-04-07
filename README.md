@@ -100,6 +100,8 @@ Features
         input: [[[[[[|]]]]]] (press <BS> at |)
         output: |
 
+        (see option g:AutoPairsDelRepeatedPairs)
+
 *  Fly Mode
 
         input: if(a[3)
@@ -242,6 +244,47 @@ Options
         Default : <M-b>
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
+
+*   g:AutoPairsUseInsertedCount
+
+        Default : 0
+
+        If this option is set, then plugin remembers how many pairs were
+        inserted automatically, and handles only this count of pairs.
+        Say, if you just typed '(', then pair ')' will be inserted, and when you type
+        ')', cursor will just jump over ')', as always.
+
+        But then, if you move cursor on any other ')' char and press ')',
+        it will not jump over it. Instead, ')' char will be inserted.
+
+        The same is for any other pair character.
+        This is how modern IDEs editors actually work (checked Eclipse,
+        Netbeans).
+
+        So, if you opened 3 parentheses, it will jump over 3 closing parentheses,
+        not more.
+
+        If you quit insert mode, pair count is reset to 0.
+
+*   g:AutoPairsDelRepeatedPairs
+
+        Default : 1
+
+        Delete Repeated Pairs in one time
+
+        input: """|""" (press <BS> at |)
+        output: |
+
+        input: {{|}} (press <BS> at |)
+        output: |
+
+        input: [[[[[[|]]]]]] (press <BS> at |)
+        output: |
+
+        If this option is not set, only one pair will be deleted
+        for single <BS> keystroke.
+
+
 
 Buffer Level Pairs Setting
 --------------------------
