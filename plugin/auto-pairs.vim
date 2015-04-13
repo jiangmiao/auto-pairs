@@ -152,6 +152,13 @@ function! AutoPairsInsert(key)
   if a:key == "'" && prev_char =~ '\v\w'
     return a:key
   end
+  
+  " Disable auto close of ' and ` in Lisp mode
+  if &filetype == 'lisp'
+    if a:key == ("'" || "`")
+      return a:key
+    end
+  end
 
   " support for ''' ``` and """
   if open == close
