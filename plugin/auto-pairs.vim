@@ -102,11 +102,6 @@ function! AutoPairsInsert(key)
     return a:key
   end
 
-  " Ignore auto close if set and current character is not whitespace
-  if g:AutoPairsOnlyWhitespace && current_char =~ '\v\S'
-    return a:key
-  endif
-
   " The key is difference open-pair, then it means only for ) ] } by default
   if !has_key(b:AutoPairs, a:key)
     let b:autopairs_saved_pair = [a:key, getpos('.')]
@@ -147,6 +142,11 @@ function! AutoPairsInsert(key)
     " Insert directly if the key is not an open key
     return a:key
   end
+
+  " Ignore auto close if set and current character is not whitespace
+  if g:AutoPairsOnlyWhitespace && current_char =~ '\v\S'
+    return a:key
+  endif
 
   let open = a:key
   let close = b:AutoPairs[open]
