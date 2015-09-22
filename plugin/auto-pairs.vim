@@ -69,6 +69,9 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsOnlyWhitespace')
+  let g:AutoPairsOnlyWhitespace = 0
+end
 
 " Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
 let g:AutoPairsClosedPairs = {}
@@ -98,6 +101,11 @@ function! AutoPairsInsert(key)
   if prev_char == '\'
     return a:key
   end
+
+  " Ignore auto close if set and current character is not whitespace
+  if g:AutoPairsOnlyWhitespace && current_char =~ '\v\S'
+    return a:key
+  endif
 
   " The key is difference open-pair, then it means only for ) ] } by default
   if !has_key(b:AutoPairs, a:key)
