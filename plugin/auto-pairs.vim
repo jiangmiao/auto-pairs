@@ -143,11 +143,6 @@ function! AutoPairsInsert(key)
     return a:key
   end
 
-  " Ignore auto close if set and current character is not whitespace
-  if g:AutoPairsOnlyWhitespace && current_char =~ '\v\S'
-    return a:key
-  endif
-
   let open = a:key
   let close = b:AutoPairs[open]
 
@@ -200,6 +195,11 @@ function! AutoPairsInsert(key)
     if n % 2 == 1
       return a:key
     endif
+  endif
+
+  " Ignore auto close if set and current character is not whitespace
+  if g:AutoPairsOnlyWhitespace && current_char =~ '\v\S'
+    return a:key
   endif
 
   return open.close."\<Left>"
