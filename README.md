@@ -243,6 +243,13 @@ Options
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
 
+*   g:AutoPairsOnlyWhitespace
+
+        Default : 0
+
+        Set it to 1 to skip autopairs unless the following character is
+        whitespace. This makes auto-pairs much less aggressive.
+
 Buffer Level Pairs Setting
 --------------------------
 

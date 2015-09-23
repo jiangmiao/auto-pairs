@@ -69,6 +69,9 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsOnlyWhitespace')
+  let g:AutoPairsOnlyWhitespace = 0
+end
 
 " Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
 let g:AutoPairsClosedPairs = {}
@@ -192,6 +195,11 @@ function! AutoPairsInsert(key)
     if n % 2 == 1
       return a:key
     endif
+  endif
+
+  " Ignore auto close if set and current character is not whitespace
+  if g:AutoPairsOnlyWhitespace && current_char =~ '\v\S'
+    return a:key
   endif
 
   return open.close."\<Left>"
