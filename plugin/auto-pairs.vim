@@ -105,13 +105,13 @@ function! AutoPairsInsert(key)
 
     " Skip the character if current character is the same as input
     if current_char == a:key
-      return "\<Right>"
+      return "\<C-G>U\<Right>"
     end
 
     if !g:AutoPairsFlyMode
       " Skip the character if next character is space
       if current_char == ' ' && next_char == a:key
-        return "\<Right>\<Right>"
+        return "\<C-G>U\<Right>\<C-G>U\<Right>"
       end
 
       " Skip the character if closed pair is next character
@@ -132,7 +132,7 @@ function! AutoPairsInsert(key)
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
     if g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
       if search(a:key, 'W')
-        return "\<Right>"
+        return "\<C-G>U\<Right>"
       endif
     endif
 
@@ -144,7 +144,7 @@ function! AutoPairsInsert(key)
   let close = b:AutoPairs[open]
 
   if current_char == close && open == close
-    return "\<Right>"
+    return "\<C-G>U\<Right>"
   end
 
   " Ignore auto close ' if follows a word
@@ -159,7 +159,7 @@ function! AutoPairsInsert(key)
     let pprev_char = line[col('.')-3]
     if pprev_char == open && prev_char == open
       " Double pair found
-      return repeat(a:key, 4) . repeat("\<LEFT>", 3)
+      return repeat(a:key, 4) . repeat("\<C-G>U\<LEFT>", 3)
     end
   end
 
@@ -194,7 +194,7 @@ function! AutoPairsInsert(key)
     endif
   endif
 
-  return open.close."\<Left>"
+  return open.close."\<C-G>U\<Left>"
 endfunction
 
 function! AutoPairsDelete()
@@ -318,10 +318,10 @@ function! AutoPairsFastWrap()
     else
       call search(s:FormatChunk(followed_open_pair, followed_close_pair), 'We')
     end
-    return "\<RIGHT>".inputed_close_pair."\<LEFT>"
+    return "\<C-G>U\<RIGHT>".inputed_close_pair."\<C-G>U\<LEFT>"
   else
     normal he
-    return "\<RIGHT>".current_char."\<LEFT>"
+    return "\<C-G>U\<RIGHT>".current_char."\<C-G>U\<LEFT>"
   end
 endfunction
 
@@ -388,7 +388,7 @@ function! AutoPairsSpace()
   let cmd = ''
   let cur_char =line[col('.')-1]
   if has_key(g:AutoPairsParens, prev_char) && g:AutoPairsParens[prev_char] == cur_char
-    let cmd = "\<SPACE>\<LEFT>"
+    let cmd = "\<SPACE>\<C-G>U\<LEFT>"
   endif
   return "\<SPACE>".cmd
 endfunction
