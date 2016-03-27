@@ -24,6 +24,11 @@ if !exists('g:AutoPairsMapBS')
   let g:AutoPairsMapBS = 1
 end
 
+" Map <C-h> as the same BS
+if !exists('g:AutoPairsMapCh')
+  let g:AutoPairsMapCh = 1
+end
+
 if !exists('g:AutoPairsMapCR')
   let g:AutoPairsMapCR = 1
 end
@@ -437,8 +442,11 @@ function! AutoPairsInit()
   if g:AutoPairsMapBS
     " Use <C-R> instead of <expr> for issue #14 sometimes press BS output strange words
     execute 'inoremap <buffer> <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
-    execute 'inoremap <buffer> <silent> <C-H> <C-R>=AutoPairsDelete()<CR>'
   end
+
+  if g:AutoPairsMapCh
+    execute 'inoremap <buffer> <silent> <C-h> <C-R>=AutoPairsDelete()<CR>'
+  endif
 
   if g:AutoPairsMapSpace
     " Try to respect abbreviations on a <SPACE>
