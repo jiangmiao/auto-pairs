@@ -4,11 +4,13 @@ Insert or delete brackets, parens, quotes in pair.
 
 Installation
 ------------
-copy plugin/auto-pairs.vim to ~/.vim/plugin
 
-or if you are using `pathogen`:
-
-```git clone git://github.com/jiangmiao/auto-pairs.git ~/.vim/bundle/auto-pairs```
+* Manual
+  * Copy `plugin/auto-pairs.vim` to `~/.vim/plugin`
+* [Pathogen](https://github.com/tpope/vim-pathogen)
+  * `git clone git://github.com/jiangmiao/auto-pairs.git ~/.vim/bundle/auto-pairs`
+* [Vundle](https://github.com/VundleVim/Vundle.vim)
+  * `Plugin 'jiangmiao/auto-pairs'`
 
 Features
 --------
