@@ -33,7 +33,7 @@ if !exists('g:AutoPairsMapCR')
   let g:AutoPairsMapCR = 1
 end
 
-if !exits('g:AutoPairsCRKey')
+if !exists('g:AutoPairsCRKey')
   let g:AutoPairsCRKey = '<CR>'
 end
 
