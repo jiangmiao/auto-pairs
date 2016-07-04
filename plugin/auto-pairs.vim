@@ -74,6 +74,10 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsCRIndent')
+  let g:AutoPairsCRIndent = keys(g:AutoPairs)
+endif
+
 " 7.4.849 support <C-G>U to avoid breaking '.'
 " Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
 " Vim note: https://github.com/vim/vim/releases/tag/v7.4.849
@@ -373,12 +377,13 @@ function! AutoPairsReturn()
   if b:autopairs_enabled == 0
     return ''
   end
+
   let line = getline('.')
   let pline = getline(line('.')-1)
   let prev_char = pline[strlen(pline)-1]
   let cmd = ''
   let cur_char = line[col('.')-1]
-  if has_key(b:AutoPairs, prev_char) && b:AutoPairs[prev_char] == cur_char
+  if has_key(b:AutoPairs, prev_char) && b:AutoPairs[prev_char] == cur_char && index(b:AutoPairsCRIndent, prev_char) != -1
     if g:AutoPairsCenterLine && winline() * 3 >= winheight(0) * 2
       " Use \<BS> instead of \<ESC>cl will cause the placeholder deleted
       " incorrect. because <C-O>zz won't leave Normal mode.
@@ -433,6 +438,9 @@ function! AutoPairsInit()
   if !exists('b:AutoPairs')
     let b:AutoPairs = g:AutoPairs
   end
+  if !exists('b:AutoPairsCRIndent')
+    let b:AutoPairsCRIndent = g:AutoPairsCRIndent
+  endif
 
   " buffer level map pairs keys
   for [open, close] in items(b:AutoPairs)
