@@ -249,6 +249,48 @@ Options
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
 
+*    g:AutoPairsOnlyAtEOL
+
+        Default: 0
+
+        Only add an auto-pair if the right-text is only whitespace
+
+*    g:AutoPairsOnlyBeforeClose
+
+        Default: 0
+
+        Only add an auto-pair if right-text is all whitespace and close tags
+
+*    g:AutoPairsBalanceImmidietely
+
+        Default: 0
+
+        If the line contains an imbalance, fix the imbalance before skipping (WIP)
+
+*    g:AutoPairsNeverSkip
+
+        Default: 0
+
+        Never skip over pairs
+
+*    g:AutoPairsNeverJumpLines
+
+        Default: 0
+
+        Never jump to another line
+
+*    g:AutoPairsSkipQuotes
+
+        Default: 0
+
+        Only when g:AutoPairsNeverSkip=1, allow skipping quotes
+
+*    g:AutoPairsDebug
+
+        Default: 0
+
+        Turn off silent mappings, allow debug messages (there are none)
+
 Buffer Level Pairs Setting
 --------------------------
 

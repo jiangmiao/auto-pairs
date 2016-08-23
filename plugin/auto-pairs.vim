@@ -62,7 +62,7 @@ endif
 " When skipping the closed pair, look at the current and
 " next line as well.
 if !exists('g:AutoPairsMultilineClose')
-  let g:AutoPairsMultilineClose = 1
+  let g:AutoPairsMultilineClose = 0
 endif
 
 " Work with Fly Mode, insert pair where jumped
@@ -73,6 +73,48 @@ endif
 if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
+
+" Only add a pair if there is nothing to the right
+if !exists('g:AutoPairsOnlyAtEOL')
+  let g:AutoPairsOnlyAtEOL = 0
+endif
+
+" Only auto-pair if text on right is close tags
+if !exists('g:AutoPairsOnlyBeforeClose')
+  let g:AutoPairsOnlyBeforeClose = 0
+endif
+
+" Balance unbalanced open parens immidietely
+if !exists('g:AutoPairsBalanceImmidietely')
+  let g:AutoPairsBalanceImmidietely = 0
+endif
+
+" Never Skip
+if !exists('g:AutoPairsNeverSkip')
+  let g:AutoPairsNeverSkip = 0
+endif
+
+" Never Jump
+if !exists('g:AutoPairsNeverJumpLines')
+  let g:AutoPairsNeverJumpLines = 0
+endif
+
+" Never Skip, but skip quotes (auto if NeverSkip=0)
+if !exists('g:AutoPairsSkipQuotes')
+  let g:AutoPairsSkipQuotes = 0
+endif
+
+" Declare all mappings without silent, alows echo(m) debugging
+if !exists('g:AutoPairsDebug')
+  let g:AutoPairsDebug = 0
+endif
+
+
+if g:AutoPairsDebug
+  let g:AutoPairsSilence = ''
+else
+  let g:AutoPairsSilence = ' <silent> '
+end
 
 " 7.4.849 support <C-G>U to avoid breaking '.'
 " Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
@@ -90,6 +132,25 @@ let s:Right = s:Go."\<RIGHT>"
 " Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
 let g:AutoPairsClosedPairs = {}
 
+" Helper
+function! s:AutoPairsCount()
+  let s:matches += 1
+  return submatch(0)
+endfunction
+function! AutoPairsCountChar(str, char)
+  let re1 = '\\'.a:char
+  let re2 = a:char
+
+  let s:matches = 0
+  call substitute(a:str, re1, '\=s:AutoPairsCount()', 'g')
+  let escaped = s:matches
+
+  let s:matches = 0
+  call substitute(a:str, re2, '\=s:AutoPairsCount()', 'g')
+  let cmatches = s:matches
+
+  return cmatches - escaped
+endfunction
 
 function! AutoPairsInsert(key)
   if !b:autopairs_enabled
@@ -107,7 +168,7 @@ function! AutoPairsInsert(key)
   let prev_char = get(prev_chars, -1, '')
 
   let eol = 0
-  if col('$') -  col('.') <= 1
+  if col('$') ==  col('.')
     let eol = 1
   end
 
@@ -121,16 +182,30 @@ function! AutoPairsInsert(key)
     let b:autopairs_saved_pair = [a:key, getpos('.')]
 
     " Skip the character if current character is the same as input
-    if current_char == a:key
-      return s:Right
-    end
+    if !g:AutoPairsNeverSkip && current_char == a:key
+      if g:AutoPairsBalanceImmidietely
 
-    if !g:AutoPairsFlyMode
+        let open_key = b:AutoPairsClosedPairs[a:key]
+
+        let c_open = AutoPairsCountChar(line,open_key)
+        let c_close = AutoPairsCountChar(line,a:key)
+
+        if c_open > c_close
+          return a:key
+        endif
+      endif
+      return s:Right
+    endif
+
+    " TODO apply BalanceImmidietely
+    if !g:AutoPairsFlyMode && !g:AutoPairsNeverSkip
       " Skip the character if next character is space
       if current_char == ' ' && next_char == a:key
         return s:Right.s:Right
       end
+    endif
 
+    if !g:AutoPairsFlyMode && !g:AutoPairsNeverSkip && !g:AutoPairsNeverJumpLines
       " Skip the character if closed pair is next character
       if current_char == ''
         if g:AutoPairsMultilineClose
@@ -147,7 +222,7 @@ function! AutoPairsInsert(key)
     endif
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
-    if g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
+    if !g:AutoPairsNeverSkip && g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
       let n = stridx(after, a:key)
       if n != -1
         return repeat(s:Right, n+1)
@@ -165,7 +240,7 @@ function! AutoPairsInsert(key)
   let open = a:key
   let close = b:AutoPairs[open]
 
-  if current_char == close && open == close
+  if (!g:AutoPairsNeverSkip || g:AutoPairsSkipQuotes) && current_char == close && open == close
     return s:Right
   end
 
@@ -216,6 +291,15 @@ function! AutoPairsInsert(key)
     endif
   endif
 
+  if g:AutoPairsOnlyAtEOL && eol==0
+    return a:key
+  end
+
+  let reclose = '\v^\s*[ '.escape(join(values(g:AutoPairs)),'})]').']*\s*$'
+  if g:AutoPairsOnlyBeforeClose && after!='' && (match(after,reclose)<0)
+    return a:key
+  end
+
   return open.close.s:Left
 endfunction
 
@@ -261,7 +345,7 @@ function! AutoPairsDelete()
   end
 
 
-  if has_key(b:AutoPairs, prev_char) 
+  if has_key(b:AutoPairs, prev_char)
     let close = b:AutoPairs[prev_char]
     if match(line,'^\s*'.close, col('.')-1) != -1
       " Delete (|___)
@@ -355,7 +439,7 @@ function! AutoPairsMap(key)
   end
   let escaped_key = substitute(key, "'", "''", 'g')
   " use expr will cause search() doesn't work
-  execute 'inoremap <buffer> <silent> '.key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
+  execute 'inoremap <buffer> '.g:AutoPairsSilence.' '.key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
 endfunction
 
 function! AutoPairsToggle()
@@ -448,11 +532,11 @@ function! AutoPairsInit()
   " Still use <buffer> level mapping for <BS> <SPACE>
   if g:AutoPairsMapBS
     " Use <C-R> instead of <expr> for issue #14 sometimes press BS output strange words
-    execute 'inoremap <buffer> <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
+    execute 'inoremap <buffer> '.g:AutoPairsSilence.' <BS> <C-R>=AutoPairsDelete()<CR>'
   end
 
   if g:AutoPairsMapCh
-    execute 'inoremap <buffer> <silent> <C-h> <C-R>=AutoPairsDelete()<CR>'
+      execute 'inoremap <buffer> '.g:AutoPairsSilence.' <C-h> <C-R>=AutoPairsDelete()<CR>'
   endif
 
   if g:AutoPairsMapSpace
@@ -461,26 +545,26 @@ function! AutoPairsInit()
     if v:version == 703 && has("patch489") || v:version > 703
       let do_abbrev = "<C-]>"
     endif
-    execute 'inoremap <buffer> <silent> <SPACE> '.do_abbrev.'<C-R>=AutoPairsSpace()<CR>'
+      execute 'inoremap <buffer> '.g:AutoPairsSilence.' <SPACE> '.do_abbrev.'<C-R>=AutoPairsSpace()<CR>'
   end
 
   if g:AutoPairsShortcutFastWrap != ''
-    execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
+      execute 'inoremap <buffer> '.g:AutoPairsSilence.' '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
   end
 
   if g:AutoPairsShortcutBackInsert != ''
-    execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutBackInsert.' <C-R>=AutoPairsBackInsert()<CR>'
+      execute 'inoremap <buffer> '.g:AutoPairsSilence.' '.g:AutoPairsShortcutBackInsert.' <C-R>=AutoPairsBackInsert()<CR>'
   end
 
   if g:AutoPairsShortcutToggle != ''
     " use <expr> to ensure showing the status when toggle
-    execute 'inoremap <buffer> <silent> <expr> '.g:AutoPairsShortcutToggle.' AutoPairsToggle()'
-    execute 'noremap <buffer> <silent> '.g:AutoPairsShortcutToggle.' :call AutoPairsToggle()<CR>'
+      execute 'inoremap <buffer> '.g:AutoPairsSilence.' <expr> '.g:AutoPairsShortcutToggle.' AutoPairsToggle()'
+      execute 'noremap <buffer> '.g:AutoPairsSilence.' '.g:AutoPairsShortcutToggle.' :call AutoPairsToggle()<CR>'
   end
 
   if g:AutoPairsShortcutJump != ''
-    execute 'inoremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' <ESC>:call AutoPairsJump()<CR>a'
-    execute 'noremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' :call AutoPairsJump()<CR>'
+      execute 'inoremap <buffer> '.g:AutoPairsSilence.' ' . g:AutoPairsShortcutJump. ' <ESC>:call AutoPairsJump()<CR>a'
+      execute 'noremap <buffer> '.g:AutoPairsSilence.' ' . g:AutoPairsShortcutJump. ' :call AutoPairsJump()<CR>'
   end
 
 endfunction
@@ -504,9 +588,9 @@ function! AutoPairsTryInit()
   " supertab doesn't support <SID>AutoPairsReturn
   " when use <SID>AutoPairsReturn  will cause Duplicated <CR>
   "
-  " and when load after vim-endwise will cause unexpected endwise inserted. 
+  " and when load after vim-endwise will cause unexpected endwise inserted.
   " so always load AutoPairs at last
-  
+
   " Buffer level keys mapping
   " comptible with other plugin
   if g:AutoPairsMapCR
@@ -550,15 +634,20 @@ function! AutoPairsTryInit()
         let old_cr = wrapper_name
       end
       " Always silent mapping
-      execute 'inoremap <script> <buffer> <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
+        execute 'inoremap <script> <buffer> '.g:AutoPairsSilence.' <CR> '.old_cr.'<SID>AutoPairsReturn'
     end
   endif
   call AutoPairsInit()
 endfunction
 
 " Always silent the command
-inoremap <silent> <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
-imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
+if g:AutoPairsDebug
+  inoremap <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
+  imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
+else
+  inoremap <silent> <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
+  imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
+endif
 
 
 au BufEnter * :call AutoPairsTryInit()
