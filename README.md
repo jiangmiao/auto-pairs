@@ -261,11 +261,15 @@ Options
 
         Only add an auto-pair if right-text is all whitespace and close tags
 
-*    g:AutoPairsBalanceImmidietely
+*    g:AutoPairsBalanceImmidiately
 
         Default: 0
 
         If the line contains an imbalance, fix the imbalance before skipping (WIP)
+
+        input: foo(bar(|) (press ) at |)
+
+        output: foo(bar()|)
 
 *    g:AutoPairsNeverSkip
 

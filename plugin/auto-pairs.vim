@@ -84,9 +84,9 @@ if !exists('g:AutoPairsOnlyBeforeClose')
   let g:AutoPairsOnlyBeforeClose = 0
 endif
 
-" Balance unbalanced open parens immidietely
-if !exists('g:AutoPairsBalanceImmidietely')
-  let g:AutoPairsBalanceImmidietely = 0
+" Balance unbalanced open parens immediately
+if !exists('g:AutoPairsBalanceImmidiately')
+  let g:AutoPairsBalanceImmidiately = 0
 endif
 
 " Never Skip
