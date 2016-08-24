@@ -166,6 +166,7 @@ function! AutoPairsInsert(key)
   let next_char = get(next_chars, 1, '')
   let prev_chars = split(before, '\zs')
   let prev_char = get(prev_chars, -1, '')
+  let reclose = '\v^\s*[ '.escape(join(values(g:AutoPairs)),'})]').']*\s*$'
 
   let eol = 0
   if col('$') ==  col('.')
@@ -223,11 +224,22 @@ function! AutoPairsInsert(key)
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
     if !g:AutoPairsNeverSkip && g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
+      if g:AutoPairsBalanceImmidiately
+          let c_open = AutoPairsCountChar(line,b:AutoPairsClosedPairs[a:key])
+          let c_close = AutoPairsCountChar(line,a:key)
+          if c_open > c_close
+            return a:key
+          endif
+      end
       let n = stridx(after, a:key)
       if n != -1
         return repeat(s:Right, n+1)
       end
-      if search(a:key, 'W')
+      if !g:AutoPairsNeverJumpLines && search(a:key, 'W')
+        " force break the '.' when jump to different line
+        return "\<Right>"
+      endif
+      if g:AutoPairsNeverJumpLines && search(a:key, 'W', line('.'))
         " force break the '.' when jump to different line
         return "\<Right>"
       endif
@@ -256,7 +268,20 @@ function! AutoPairsInsert(key)
     let pprev_char = line[col('.')-3]
     if pprev_char == open && prev_char == open
       " Double pair found
+      if g:AutoPairsOnlyAtEOL && eol==0
+        return a:key
+      end
+      "if g:AutoPairsOnlyBeforeClose && after!='' && (match(after,reclose)<0)
+      if g:AutoPairsOnlyBeforeClose && (match(after,reclose)<0)
+        return a:key
+      end
       return repeat(a:key, 4) . repeat(s:Left, 3)
+    end
+    if g:AutoPairsBalanceImmidiately
+        let quotes = AutoPairsCountChar(line,open)
+        if quotes%2
+          return a:key
+        endif
     end
   end
 
@@ -295,8 +320,7 @@ function! AutoPairsInsert(key)
     return a:key
   end
 
-  let reclose = '\v^\s*[ '.escape(join(values(g:AutoPairs)),'})]').']*\s*$'
-  if g:AutoPairsOnlyBeforeClose && after!='' && (match(after,reclose)<0)
+  if g:AutoPairsOnlyBeforeClose && (match(after,reclose)<0)
     return a:key
   end
 
