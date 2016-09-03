@@ -28,6 +28,11 @@ if !exists('g:AutoPairsNormalJump')
   let g:AutoPairsNormalJump = 1
 end
 
+" Map <C-h> as the same BS
+if !exists('g:AutoPairsMapCh')
+  let g:AutoPairsMapCh = 1
+end
+
 if !exists('g:AutoPairsMapCR')
   let g:AutoPairsMapCR = 1
 end
@@ -58,6 +63,12 @@ if !exists('g:AutoPairsFlyMode')
   let g:AutoPairsFlyMode = 0
 endif
 
+" When skipping the closed pair, look at the current and
+" next line as well.
+if !exists('g:AutoPairsMultilineClose')
+  let g:AutoPairsMultilineClose = 1
+endif
+
 " Work with Fly Mode, insert pair where jumped
 if !exists('g:AutoPairsShortcutBackInsert')
   let g:AutoPairsShortcutBackInsert = '<M-b>'
@@ -66,6 +77,18 @@ endif
 if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
+
+" 7.4.849 support <C-G>U to avoid breaking '.'
+" Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
+" Vim note: https://github.com/vim/vim/releases/tag/v7.4.849
+if v:version >= 704 && has("patch849")
+  let s:Go = "\<C-G>U"
+else
+  let s:Go = ""
+endif
+
+let s:Left = s:Go."\<LEFT>"
+let s:Right = s:Go."\<RIGHT>"
 
 
 " Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
@@ -103,20 +126,24 @@ function! AutoPairsInsert(key)
 
     " Skip the character if current character is the same as input
     if current_char == a:key
-      return "\<Right>"
+      return s:Right
     end
 
     if !g:AutoPairsFlyMode
       " Skip the character if next character is space
       if current_char == ' ' && next_char == a:key
-        return "\<Right>\<Right>"
+        return s:Right.s:Right
       end
 
       " Skip the character if closed pair is next character
       if current_char == ''
-        let next_lineno = line('.')+1
-        let next_line = getline(nextnonblank(next_lineno))
-        let next_char = matchstr(next_line, '\s*\zs.')
+        if g:AutoPairsMultilineClose
+          let next_lineno = line('.')+1
+          let next_line = getline(nextnonblank(next_lineno))
+          let next_char = matchstr(next_line, '\s*\zs.')
+        else
+          let next_char = matchstr(line, '\s*\zs.')
+        end
         if next_char == a:key
           return "\<ESC>e^a"
         endif
@@ -125,7 +152,12 @@ function! AutoPairsInsert(key)
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
     if g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
+      let n = stridx(after, a:key)
+      if n != -1
+        return repeat(s:Right, n+1)
+      end
       if search(a:key, 'W')
+        " force break the '.' when jump to different line
         return "\<Right>"
       endif
     endif
@@ -138,7 +170,7 @@ function! AutoPairsInsert(key)
   let close = b:AutoPairs[open]
 
   if current_char == close && open == close
-    return "\<Right>"
+    return s:Right
   end
 
   " Ignore auto close ' if follows a word
@@ -153,7 +185,7 @@ function! AutoPairsInsert(key)
     let pprev_char = line[col('.')-3]
     if pprev_char == open && prev_char == open
       " Double pair found
-      return repeat(a:key, 4) . repeat("\<LEFT>", 3)
+      return repeat(a:key, 4) . repeat(s:Left, 3)
     end
   end
 
@@ -188,7 +220,7 @@ function! AutoPairsInsert(key)
     endif
   endif
 
-  return open.close."\<Left>"
+  return open.close.s:Left
 endfunction
 
 function! AutoPairsDelete()
@@ -312,10 +344,10 @@ function! AutoPairsFastWrap()
     else
       call search(s:FormatChunk(followed_open_pair, followed_close_pair), 'We')
     end
-    return "\<RIGHT>".inputed_close_pair."\<LEFT>"
+    return s:Right.inputed_close_pair.s:Left
   else
     normal he
-    return "\<RIGHT>".current_char."\<LEFT>"
+    return s:Right.current_char.s:Left
   end
 endfunction
 
@@ -355,7 +387,9 @@ function! AutoPairsReturn()
       " Use \<BS> instead of \<ESC>cl will cause the placeholder deleted
       " incorrect. because <C-O>zz won't leave Normal mode.
       " Use \<DEL> is a bit wierd. the character before cursor need to be deleted.
-      let cmd = " \<C-O>zz\<ESC>cl\<ESC>"
+      " Adding a space, recentering, and deleting it interferes with default
+      " whitespace-removing behavior when exiting insert mode.
+      let cmd = "\<ESC>zzcc"
     end
 
     " If equalprg has been set, then avoid call =
@@ -382,7 +416,7 @@ function! AutoPairsSpace()
   let cmd = ''
   let cur_char =line[col('.')-1]
   if has_key(g:AutoPairsParens, prev_char) && g:AutoPairsParens[prev_char] == cur_char
-    let cmd = "\<SPACE>\<LEFT>"
+    let cmd = "\<SPACE>".s:Left
   endif
   return "\<SPACE>".cmd
 endfunction
@@ -419,8 +453,11 @@ function! AutoPairsInit()
   if g:AutoPairsMapBS
     " Use <C-R> instead of <expr> for issue #14 sometimes press BS output strange words
     execute 'inoremap <buffer> <silent> <BS> <C-R>=AutoPairsDelete()<CR>'
-    execute 'inoremap <buffer> <silent> <C-H> <C-R>=AutoPairsDelete()<CR>'
   end
+
+  if g:AutoPairsMapCh
+    execute 'inoremap <buffer> <silent> <C-h> <C-R>=AutoPairsDelete()<CR>'
+  endif
 
   if g:AutoPairsMapSpace
     " Try to respect abbreviations on a <SPACE>
