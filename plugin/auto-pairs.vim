@@ -184,7 +184,7 @@ function! AutoPairsInsert(key)
 
     " Skip the character if current character is the same as input
     if !g:AutoPairsNeverSkip && current_char == a:key
-      if g:AutoPairsBalanceImmidietely
+      if g:AutoPairsBalanceImmidiately
 
         let open_key = b:AutoPairsClosedPairs[a:key]
 
@@ -198,7 +198,7 @@ function! AutoPairsInsert(key)
       return s:Right
     endif
 
-    " TODO apply BalanceImmidietely
+    " TODO apply BalanceImmidiately
     if !g:AutoPairsFlyMode && !g:AutoPairsNeverSkip
       " Skip the character if next character is space
       if current_char == ' ' && next_char == a:key
