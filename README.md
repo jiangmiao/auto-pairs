@@ -295,6 +295,18 @@ Options
 
         Turn off silent mappings, allow debug messages (there are none)
 
+Minimal Annoyance Settings
+--------------------------
+
+If you dislike the cursor moving unexpectedly, and only wish of autopairs to close near
+the end of the line, add these settings to your vimrc.
+
+    let g:AutoPairsMultilineClose=0
+    let g:AutoPairsOnlyBeforeClose=1
+    let g:AutoPairsBalanceImmidietely=1
+    let g:AutoPairsNeverJumpLines=1
+
+
 Buffer Level Pairs Setting
 --------------------------
 
