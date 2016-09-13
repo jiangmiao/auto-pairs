@@ -261,7 +261,7 @@ Options
 
         Only add an auto-pair if right-text is all whitespace and close tags
 
-*    g:AutoPairsBalanceImmidiately
+*    g:AutoPairsBalanceImmediately
 
         Default: 0
 
@@ -303,7 +303,7 @@ the end of the line, add these settings to your vimrc.
 
     let g:AutoPairsMultilineClose=0
     let g:AutoPairsOnlyBeforeClose=1
-    let g:AutoPairsBalanceImmidietely=1
+    let g:AutoPairsBalanceImmediately=1
     let g:AutoPairsNeverJumpLines=1
 
 

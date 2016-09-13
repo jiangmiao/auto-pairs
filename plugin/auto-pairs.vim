@@ -85,8 +85,8 @@ if !exists('g:AutoPairsOnlyBeforeClose')
 endif
 
 " Balance unbalanced open parens immediately
-if !exists('g:AutoPairsBalanceImmidiately')
-  let g:AutoPairsBalanceImmidiately = 0
+if !exists('g:AutoPairsBalanceImmediately')
+  let g:AutoPairsBalanceImmediately = 0
 endif
 
 " Never Skip
@@ -184,7 +184,7 @@ function! AutoPairsInsert(key)
 
     " Skip the character if current character is the same as input
     if !g:AutoPairsNeverSkip && current_char == a:key
-      if g:AutoPairsBalanceImmidiately
+      if g:AutoPairsBalanceImmediately
 
         let open_key = b:AutoPairsClosedPairs[a:key]
 
@@ -198,7 +198,7 @@ function! AutoPairsInsert(key)
       return s:Right
     endif
 
-    " TODO apply BalanceImmidiately
+    " TODO apply BalanceImmediately
     if !g:AutoPairsFlyMode && !g:AutoPairsNeverSkip
       " Skip the character if next character is space
       if current_char == ' ' && next_char == a:key
@@ -224,7 +224,7 @@ function! AutoPairsInsert(key)
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
     if !g:AutoPairsNeverSkip && g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
-      if g:AutoPairsBalanceImmidiately
+      if g:AutoPairsBalanceImmediately
           let c_open = AutoPairsCountChar(line,b:AutoPairsClosedPairs[a:key])
           let c_close = AutoPairsCountChar(line,a:key)
           if c_open > c_close
@@ -277,7 +277,7 @@ function! AutoPairsInsert(key)
       end
       return repeat(a:key, 4) . repeat(s:Left, 3)
     end
-    if g:AutoPairsBalanceImmidiately
+    if g:AutoPairsBalanceImmediately
         let quotes = AutoPairsCountChar(line,open)
         if quotes%2
           return a:key
