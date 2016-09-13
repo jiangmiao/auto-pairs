@@ -283,6 +283,19 @@ Options
 
         Never jump to another line
 
+*   g:AutoPairsAutoNewlineAfter
+
+        Default: []
+
+        Automatically add a newline after this opening character(s)
+
+        let g:AutoPairsAutoNewlineAfter = ['{'] will act as though you pressed <CR> after {
+
+        NOTE: single quotes must be escaped (with a quote), use <BAR> for |
+
+
+
+
 *    g:AutoPairsSkipQuotes
 
         Default: 0
