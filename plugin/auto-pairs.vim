@@ -99,6 +99,11 @@ if !exists('g:AutoPairsNeverJumpLines')
   let g:AutoPairsNeverJumpLines = 0
 endif
 
+" Trigger abbreviations if available
+if !exists('g:AutoPairsTriggerAbbrev')
+  let g:AutoPairsTriggerAbbrev = 1
+endif
+
 " Auto Newline after character
 if !exists('g:AutoPairsAutoNewlineAfter')
   let g:AutoPairsAutoNewlineAfter = []
@@ -474,7 +479,11 @@ function! AutoPairsMap(key)
   end
   let escaped_key = substitute(key, "'", "''", 'g')
   " use expr will cause search() doesn't work
+  if g:AutoPairsTriggerAbbrev
+    execute 'inoremap <buffer> '.g:AutoPairsSilence.' '.key." <C-]><C-R>=AutoPairsInsert('".escaped_key."')<CR>"
+  else
     execute 'inoremap <buffer> '.g:AutoPairsSilence.' '.key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
+  endif
 endfunction
 
 function! AutoPairsToggle()
