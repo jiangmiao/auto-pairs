@@ -551,6 +551,7 @@ function! AutoPairsTryInit()
       end
       " Always silent mapping
       execute 'inoremap <script> <buffer> <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
+      execute 'inoremap <script> <buffer> <silent> <c-j> '.old_cr.'<SID>AutoPairsReturn'
     end
   endif
   call AutoPairsInit()
