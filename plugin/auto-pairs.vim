@@ -74,6 +74,10 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsIgnoreCharacters')
+  let g:AutoPairsIgnoreCharacters = ['\']
+endif
+
 " 7.4.849 support <C-G>U to avoid breaking '.'
 " Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
 " Vim note: https://github.com/vim/vim/releases/tag/v7.4.849
@@ -111,8 +115,8 @@ function! AutoPairsInsert(key)
     let eol = 1
   end
 
-  " Ignore auto close if prev character is \
-  if prev_char == '\'
+  " Ignore auto close if prev character is in g:AutoPairsIgnoreCharacters
+  if index(g:AutoPairsIgnoreCharacters, prev_char) != -1
     return a:key
   end
 
@@ -231,7 +235,7 @@ function! AutoPairsDelete()
   let prev_char = get(prev_chars, -1, '')
   let pprev_char = get(prev_chars, -2, '')
 
-  if pprev_char == '\'
+  if index(g:AutoPairsIgnoreCharacters, pprev_char) != -1
     return "\<BS>"
   end
 
@@ -261,7 +265,7 @@ function! AutoPairsDelete()
   end
 
 
-  if has_key(b:AutoPairs, prev_char) 
+  if has_key(b:AutoPairs, prev_char)
     let close = b:AutoPairs[prev_char]
     if match(line,'^\s*'.close, col('.')-1) != -1
       " Delete (|___)
@@ -504,9 +508,9 @@ function! AutoPairsTryInit()
   " supertab doesn't support <SID>AutoPairsReturn
   " when use <SID>AutoPairsReturn  will cause Duplicated <CR>
   "
-  " and when load after vim-endwise will cause unexpected endwise inserted. 
+  " and when load after vim-endwise will cause unexpected endwise inserted.
   " so always load AutoPairs at last
-  
+
   " Buffer level keys mapping
   " comptible with other plugin
   if g:AutoPairsMapCR
