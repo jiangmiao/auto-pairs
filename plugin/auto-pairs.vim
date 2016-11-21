@@ -261,7 +261,7 @@ function! AutoPairsDelete()
   end
 
 
-  if has_key(b:AutoPairs, prev_char) 
+  if has_key(b:AutoPairs, prev_char)
     let close = b:AutoPairs[prev_char]
     if match(line,'^\s*'.close, col('.')-1) != -1
       " Delete (|___)
@@ -500,9 +500,9 @@ function! AutoPairsTryInit()
   " supertab doesn't support <SID>AutoPairsReturn
   " when use <SID>AutoPairsReturn  will cause Duplicated <CR>
   "
-  " and when load after vim-endwise will cause unexpected endwise inserted. 
+  " and when load after vim-endwise will cause unexpected endwise inserted.
   " so always load AutoPairs at last
-  
+
   " Buffer level keys mapping
   " comptible with other plugin
   if g:AutoPairsMapCR
