@@ -321,7 +321,7 @@ function! AutoPairsFastWrap()
   let next_char = line[col('.')]
   let open_pair_pattern = '\v[({\[''"]'
   let at_end = col('.') >= col('$') - 1
-  normal x
+  normal! x
   " Skip blank
   if next_char =~ '\v\s' || at_end
     call search('\v\S', 'W')
@@ -342,7 +342,7 @@ function! AutoPairsFastWrap()
     end
     return s:Right.inputed_close_pair.s:Left
   else
-    normal he
+    normal! he
     return s:Right.current_char.s:Left
   end
 endfunction
