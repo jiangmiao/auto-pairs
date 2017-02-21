@@ -129,12 +129,23 @@ function! AutoPairsInsert(key)
       return s:Right
     end
 
-    if !g:AutoPairsFlyMode
-      " Skip the character if next character is space
-      if current_char == ' ' && next_char == a:key
-        return s:Right.s:Right
-      end
+    " Skip the character if closed pair is next character
+    if current_char == ' ' && next_char == a:key
+      " Remove the space we added if the pair is empty
+      if has_key(b:AutoPairsClosedPairs, a:key)
+        let end_of_prevchar_index = matchend(before, '\S\ze\s*$')
+        if end_of_prevchar_index > -1
+          let end_of_prevchar = get(prev_chars, end_of_prevchar_index-1, '')
+          if end_of_prevchar == b:AutoPairsClosedPairs[a:key]
+            return "\<DEL>".s:Right
+          endif
+        endif
+      endif
 
+      return s:Right.s:Right
+    endif
+
+    if !g:AutoPairsFlyMode
       " Skip the character if closed pair is next character
       if current_char == ''
         if g:AutoPairsMultilineClose
