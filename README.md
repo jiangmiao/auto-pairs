@@ -169,9 +169,15 @@ Options
 
         Default: {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 
-*   b:AutoPairs
+*   g:AutoPairsNewline
 
-        Default: g:AutoPairs
+        Default: Same as g:AutoPairs, but with '>' and '<' added for indenting html tags.
+
+        The characters for inserting a new indented line after Return.
+
+*   b:AutoPairs, b:AutoPairsNewline
+
+        Default: g:AutoPairs, g:AutoPairsNewline
 
         Buffer level pairs set.
 
