@@ -249,6 +249,15 @@ Options
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
 
+*   g:AutoPairsCRIndent
+
+        Default: All characters in g:AutoPairs
+
+        Selects which characters should have an indented line inserted between them
+        when return is pressed.
+
+        let g:AutoPairsCRIndent = ['{', '[']
+
 Buffer Level Pairs Setting
 --------------------------
 
