@@ -249,6 +249,83 @@ Options
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
 
+*    g:AutoPairsOnlyAtEOL
+
+        Default: 0
+
+        Only add an auto-pair if the right-text is only whitespace
+
+*    g:AutoPairsOnlyBeforeClose
+
+        Default: 0
+
+        Only add an auto-pair if right-text is all whitespace and close tags
+
+*    g:AutoPairsBalanceImmediately
+
+        Default: 0
+
+        If the line contains an imbalance, fix the imbalance before skipping (WIP)
+
+        input: foo(bar(|) (press ) at |)
+
+        output: foo(bar()|)
+
+*    g:AutoPairsNeverSkip
+
+        Default: 0
+
+        Never skip over pairs
+
+*    g:AutoPairsNeverJumpLines
+
+        Default: 0
+
+        Never jump to another line
+
+*    g:AutoPairsTriggerAbbrev
+
+        Default: 1
+
+        Trigger abbreviations as expected
+
+*   g:AutoPairsAutoNewlineAfter
+
+        Default: []
+
+        Automatically add a newline after this opening character(s)
+
+        let g:AutoPairsAutoNewlineAfter = ['{'] will act as though you pressed <CR> after {
+
+        NOTE: single quotes must be escaped (with a quote), use <BAR> for |
+
+
+
+
+*    g:AutoPairsSkipQuotes
+
+        Default: 0
+
+        Only when g:AutoPairsNeverSkip=1, allow skipping quotes
+
+*    g:AutoPairsDebug
+
+        Default: 0
+
+        Turn off silent mappings, allow debug messages (there are none)
+
+Minimal Annoyance Settings
+--------------------------
+
+If you dislike the cursor moving unexpectedly, and only wish of autopairs to close near
+the end of the line, add these settings to your vimrc.
+
+    let g:AutoPairsMultilineClose=0
+    let g:AutoPairsOnlyBeforeClose=1
+    let g:AutoPairsBalanceImmediately=1
+    let g:AutoPairsNeverJumpLines=1
+
+
 Buffer Level Pairs Setting
 --------------------------
 
