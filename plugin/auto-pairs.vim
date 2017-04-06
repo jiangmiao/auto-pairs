@@ -20,6 +20,10 @@ if !exists('g:AutoPairsParens')
   let g:AutoPairsParens = {'(':')', '[':']', '{':'}'}
 end
 
+if !exists('g:AutoPairsDisableInsideText')
+  let g:AutoPairsDisableInsideText = 1
+endif
+
 if !exists('g:AutoPairsMapBS')
   let g:AutoPairsMapBS = 1
 end
@@ -95,6 +99,13 @@ function! AutoPairsInsert(key)
   if !b:autopairs_enabled
     return a:key
   end
+
+  if g:AutoPairsDisableInsideText == 1
+    let l:current_char = getline(".")[col(".")-1]
+    if strlen(l:current_char) != 0
+      return a:key
+    endif
+  endif
 
   let line = getline('.')
   let pos = col('.') - 1
