@@ -74,6 +74,10 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsCarryOnReturn')
+  let g:AutoPairsCarryOnReturn = 0
+endif
+
 " 7.4.849 support <C-G>U to avoid breaking '.'
 " Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
 " Vim note: https://github.com/vim/vim/releases/tag/v7.4.849
@@ -384,20 +388,36 @@ function! AutoPairsReturn()
       let cmd = "zz"
     end
 
+    let ret = ''
+
+    " make sure we carry only if trimmed line contains anything other
+    " than cur_char
+    let carry = substitute(line, '^\s*\(.\{-}\)\s*$', '\1', '') != cur_char
+    if g:AutoPairsCarryOnReturn && carry
+      " remove-copy everything after the cur_char
+      let ret .= "\<ESC>2wD"
+    endif
+
     " If equalprg has been set, then avoid call =
     " https://github.com/jiangmiao/auto-pairs/issues/24
     if &equalprg != ''
-      return "\<ESC>".cmd."O"
-    endif
+      let ret .= "\<ESC>".cmd."O"
 
     " conflict with javascript and coffee
     " javascript   need   indent new line
     " coffeescript forbid indent new line
-    if &filetype == 'coffeescript' || &filetype == 'coffee'
-      return "\<ESC>".cmd."k==o"
+    elseif &filetype == 'coffeescript' || &filetype == 'coffee'
+      let ret .= "\<ESC>".cmd."k==o"
     else
-      return "\<ESC>".cmd."=ko"
+      let ret .= "\<ESC>".cmd."=ko"
     endif
+
+    if g:AutoPairsCarryOnReturn && carry
+      " paste copied fragment back onto line, format, remain in normal mode
+      let ret .= "\<ESC>p=="
+    endif
+
+    return ret
   end
   return ''
 endfunction
