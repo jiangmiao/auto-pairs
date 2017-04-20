@@ -404,9 +404,12 @@ function! AutoPairsReturn()
     endif
 
     if carry
-      let pline = strpart(pline, 0, strlen(pline) - 1)
+      " make sure we carry only if trimmed line contains anything other
+      " than cur_char
+      let c1 = substitute(line, '^\s*\(.\{-}\)\s*$', '\1', '') != cur_char
 
       " do not carry if we are in the middle of wrapping parens
+      let pline = strpart(pline, 0, strlen(pline) - 1)
       let r1 = substitute(pline, '[^(]', '', 'g')
       let r2 = substitute(pline, '[^)]', '', 'g')
       let s1 = substitute(pline, '[^\[]', '', 'g')
@@ -414,9 +417,6 @@ function! AutoPairsReturn()
       let q1 = substitute(pline, '[^{]', '', 'g')
       let q2 = substitute(pline, '[^}]', '', 'g')
 
-      " make sure we carry only if trimmed line contains anything other
-      " than cur_char
-      let c1 = substitute(line, '^\s*\(.\{-}\)\s*$', '\1', '') != cur_char
       let c2 = strlen(r1) == strlen(r2) && strlen(s1) == strlen(s2) && strlen(q1) == strlen(q2)
 
       let carry = c1 && c2
@@ -424,7 +424,7 @@ function! AutoPairsReturn()
 
     if carry
       " remove-copy everything after the cur_char
-      let ret .= "\<ESC>wD"
+      let ret .= "\<ESC>^lD"
     endif
 
     " If equalprg has been set, then avoid call =
