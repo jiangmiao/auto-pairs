@@ -90,6 +90,8 @@ endif
 let s:Left = s:Go."\<LEFT>"
 let s:Right = s:Go."\<RIGHT>"
 
+let s:AutoPairsCarryFlag = 1
+
 
 " Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
 let g:AutoPairsClosedPairs = {}
@@ -164,6 +166,9 @@ function! AutoPairsInsert(key)
 
     " Insert directly if the key is not an open key
     return a:key
+  else
+    " We open
+    let s:AutoPairsCarryFlag = 1
   end
 
   let open = a:key
@@ -390,12 +395,36 @@ function! AutoPairsReturn()
 
     let ret = ''
 
-    " make sure we carry only if trimmed line contains anything other
-    " than cur_char
-    let carry = substitute(line, '^\s*\(.\{-}\)\s*$', '\1', '') != cur_char
-    if g:AutoPairsCarryOnReturn && carry
+    " carry only if enabled and if we broke line inbetween parens
+    let carry = g:AutoPairsCarryOnReturn && has_key(g:AutoPairsParens, prev_char)
+
+    " carry only if carry flag is on (user has just opened a new set of parens)
+    if !s:AutoPairsCarryFlag
+      let carry = 0
+    endif
+
+    if carry
+      let pline = strpart(pline, 0, strlen(pline) - 1)
+
+      " do not carry if we are in the middle of wrapping parens
+      let r1 = substitute(pline, '[^(]', '', 'g')
+      let r2 = substitute(pline, '[^)]', '', 'g')
+      let s1 = substitute(pline, '[^\[]', '', 'g')
+      let s2 = substitute(pline, '[^\]]', '', 'g')
+      let q1 = substitute(pline, '[^{]', '', 'g')
+      let q2 = substitute(pline, '[^}]', '', 'g')
+
+      " make sure we carry only if trimmed line contains anything other
+      " than cur_char
+      let c1 = substitute(line, '^\s*\(.\{-}\)\s*$', '\1', '') != cur_char
+      let c2 = strlen(r1) == strlen(r2) && strlen(s1) == strlen(s2) && strlen(q1) == strlen(q2)
+
+      let carry = c1 && c2
+    endif
+
+    if carry
       " remove-copy everything after the cur_char
-      let ret .= "\<ESC>2wD"
+      let ret .= "\<ESC>wD"
     endif
 
     " If equalprg has been set, then avoid call =
@@ -412,7 +441,7 @@ function! AutoPairsReturn()
       let ret .= "\<ESC>".cmd."=ko"
     endif
 
-    if g:AutoPairsCarryOnReturn && carry
+    if carry
       " paste copied fragment back onto line, format, remain in normal mode
       let ret .= "\<ESC>p=="
     endif
@@ -578,3 +607,4 @@ imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
 
 
 au BufEnter * :call AutoPairsTryInit()
+au InsertLeave * :let s:AutoPairsCarryFlag=0
