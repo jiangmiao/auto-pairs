@@ -53,6 +53,10 @@ if !exists('g:AutoPairsShortcutJump')
   let g:AutoPairsShortcutJump = '<M-n>'
 endif
 
+if !exists('g:AutoPairsAnnoyingMode')
+  let g:AutoPairsAnnoyingMode = '0'
+endif
+
 " Fly mode will for closed pair to jump to closed pair instead of insert.
 " also support AutoPairsBackInsert to insert pairs where jumped.
 if !exists('g:AutoPairsFlyMode')
@@ -141,7 +145,11 @@ function! AutoPairsInsert(key)
           let next_char = matchstr(line, '\s*\zs.')
         end
         if next_char == a:key
-          return "\<ESC>e^a"
+          if g:AutoPairsAnnoyingMode
+            return "\<ESC>e^a"
+          else
+            return a:key
+          end
         endif
       endif
     endif
@@ -558,3 +566,4 @@ imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
 
 
 au BufEnter * :call AutoPairsTryInit()
+
