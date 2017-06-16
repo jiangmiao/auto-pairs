@@ -1,8 +1,8 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
-" Last Change:  2013-07-13
-" Version: 1.3.2
+" Last Change:  2017-06-17
+" Version: 1.3.3
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
 " License: MIT
@@ -47,6 +47,10 @@ end
 
 if !exists('g:AutoPairsShortcutFastWrap')
   let g:AutoPairsShortcutFastWrap = '<M-e>'
+end
+
+if !exists('g:AutoPairsMoveCharacter')
+  let g:AutoPairsMoveCharacter = "()[]{}\"'"
 end
 
 if !exists('g:AutoPairsShortcutJump')
@@ -356,6 +360,7 @@ function! AutoPairsMap(key)
   let escaped_key = substitute(key, "'", "''", 'g')
   " use expr will cause search() doesn't work
   execute 'inoremap <buffer> <silent> '.key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
+
 endfunction
 
 function! AutoPairsToggle()
@@ -367,6 +372,12 @@ function! AutoPairsToggle()
     echo 'AutoPairs Enabled.'
   end
   return ''
+endfunction
+
+function! AutoPairsMoveCharacter(key)
+  let c = getline(".")[col(".")-1]
+  let escaped_key = substitute(a:key, "'", "''", 'g')
+  return "\<DEL>\<ESC>:call search("."'".escaped_key."'".")\<CR>a".c."\<LEFT>"
 endfunction
 
 function! AutoPairsReturn()
@@ -425,11 +436,17 @@ endfunction
 
 function! AutoPairsInit()
   let b:autopairs_loaded  = 1
-  let b:autopairs_enabled = 1
+  if !exists('b:autopairs_enabled')
+    let b:autopairs_enabled = 1
+  end
   let b:AutoPairsClosedPairs = {}
 
   if !exists('b:AutoPairs')
     let b:AutoPairs = g:AutoPairs
+  end
+
+  if !exists('b:AutoPairsMoveCharacter')
+    let b:AutoPairsMoveCharacter = g:AutoPairsMoveCharacter
   end
 
   " buffer level map pairs keys
@@ -439,6 +456,11 @@ function! AutoPairsInit()
       call AutoPairsMap(close)
     end
     let b:AutoPairsClosedPairs[close] = open
+  endfor
+
+  for key in split(b:AutoPairsMoveCharacter, '\s*')
+    let escaped_key = substitute(key, "'", "''", 'g')
+    execute 'inoremap <silent> <buffer> <M-'.key."> <C-R>=AutoPairsMoveCharacter('".escaped_key."')<CR>"
   endfor
 
   " Still use <buffer> level mapping for <BS> <SPACE>

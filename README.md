@@ -67,6 +67,14 @@ Features
         input: |[foo, bar()] (press (<M-e> at |)
         output: ([foo, bar()])
 
+*   Quick move char to closed pair
+
+        input: (|){["foo"]} (press <M-}> at |)
+        output: ({["foo"]}|)
+
+        input: |[foo, bar()] (press (<M-]> at |)
+        output: ([foo, bar()]|)
+
 *   Quick jump to closed pair.
 
         input:
@@ -248,6 +256,13 @@ Options
         Default : <M-b>
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
+
+*   g:AutoPairsMoveCharacter
+
+        Default: "()[]{}\"'"
+
+        Map <M-(> <M-)> <M-[> <M-]> <M-{> <M-}> <M-"> <M-'> to
+        move character under the cursor to the pair.
 
 Buffer Level Pairs Setting
 --------------------------
