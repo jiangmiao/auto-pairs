@@ -13,11 +13,11 @@ end
 let g:AutoPairsLoaded = 1
 
 if !exists('g:AutoPairs')
-  let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
+  let g:AutoPairs = {'(':')', '[':']', '{':'}', '<':'>', "'":"'",'"':'"', '`':'`'}
 end
 
 if !exists('g:AutoPairsParens')
-  let g:AutoPairsParens = {'(':')', '[':']', '{':'}'}
+  let g:AutoPairsParens = {'(':')', '[':']', '{':'}', '<':'>'}
 end
 
 if !exists('g:AutoPairsMapBS')
