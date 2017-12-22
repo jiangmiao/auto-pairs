@@ -78,6 +78,10 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsSkipCharacter')
+  let g:AutoPairsSkipCharacter = 1
+endif
+
 " 7.4.849 support <C-G>U to avoid breaking '.'
 " Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
 " Vim note: https://github.com/vim/vim/releases/tag/v7.4.849
@@ -124,31 +128,33 @@ function! AutoPairsInsert(key)
   if !has_key(b:AutoPairs, a:key)
     let b:autopairs_saved_pair = [a:key, getpos('.')]
 
-    " Skip the character if current character is the same as input
-    if current_char == a:key
-      return s:Right
-    end
-
-    if !g:AutoPairsFlyMode
-      " Skip the character if next character is space
-      if current_char == ' ' && next_char == a:key
-        return s:Right.s:Right
-      end
-
-      " Skip the character if closed pair is next character
-      if current_char == ''
-        if g:AutoPairsMultilineClose
-          let next_lineno = line('.')+1
-          let next_line = getline(nextnonblank(next_lineno))
-          let next_char = matchstr(next_line, '\s*\zs.')
-        else
-          let next_char = matchstr(line, '\s*\zs.')
+    if g:AutoPairsSkipCharacter
+        " Skip the character if current character is the same as input
+        if current_char == a:key
+          return s:Right
         end
-        if next_char == a:key
-          return "\<ESC>e^a"
+
+      if !g:AutoPairsFlyMode
+        " Skip the character if next character is space
+        if current_char == ' ' && next_char == a:key
+          return s:Right.s:Right
+        end
+
+        " Skip the character if closed pair is next character
+        if current_char == ''
+          if g:AutoPairsMultilineClose
+            let next_lineno = line('.')+1
+            let next_line = getline(nextnonblank(next_lineno))
+            let next_char = matchstr(next_line, '\s*\zs.')
+          else
+            let next_char = matchstr(line, '\s*\zs.')
+          end
+          if next_char == a:key
+            return "\<ESC>e^a"
+          endif
         endif
       endif
-    endif
+    end
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
     if g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
@@ -169,7 +175,7 @@ function! AutoPairsInsert(key)
   let open = a:key
   let close = b:AutoPairs[open]
 
-  if current_char == close && open == close
+  if current_char == close && open == close && g:AutoPairsSkipCharacter
     return s:Right
   end
 
@@ -180,7 +186,7 @@ function! AutoPairsInsert(key)
   end
 
   " support for ''' ``` and """
-  if open == close
+  if open == close && g:AutoPairsSkipCharacter
     " The key must be ' " `
     let pprev_char = line[col('.')-3]
     if pprev_char == open && prev_char == open
