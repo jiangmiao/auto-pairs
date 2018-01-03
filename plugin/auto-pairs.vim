@@ -16,6 +16,10 @@ if !exists('g:AutoPairs')
   let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 end
 
+if !exists('g:AutoPairsDelete')
+  let g:AutoPairsDelete = g:AutoPairs
+end
+
 if !exists('g:AutoPairsParens')
   let g:AutoPairsParens = {'(':')', '[':']', '{':'}'}
 end
@@ -246,12 +250,12 @@ function! AutoPairsDelete()
   end
 
   " Delete last two spaces in parens, work with MapSpace
-  if has_key(b:AutoPairs, pprev_char) && prev_char == ' ' && current_char == ' '
+  if has_key(b:AutoPairsDelete, pprev_char) && prev_char == ' ' && current_char == ' '
     return "\<BS>\<DEL>"
   endif
 
   " Delete Repeated Pair eg: '''|''' [[|]] {{|}}
-  if has_key(b:AutoPairs, prev_char)
+  if has_key(b:AutoPairsDelete, prev_char)
     let times = 0
     let p = -1
     while get(prev_chars, p, '') == prev_char
@@ -259,7 +263,7 @@ function! AutoPairsDelete()
       let times = times + 1
     endwhile
 
-    let close = b:AutoPairs[prev_char]
+    let close = b:AutoPairsDelete[prev_char]
     let left = repeat(prev_char, times)
     let right = repeat(close, times)
 
@@ -271,8 +275,8 @@ function! AutoPairsDelete()
   end
 
 
-  if has_key(b:AutoPairs, prev_char)
-    let close = b:AutoPairs[prev_char]
+  if has_key(b:AutoPairsDelete, prev_char)
+    let close = b:AutoPairsDelete[prev_char]
     if match(line,'^\s*'.close, col('.')-1) != -1
       " Delete (|___)
       let space = matchstr(line, '^\s*', col('.')-1)
@@ -339,10 +343,10 @@ function! AutoPairsFastWrap()
     let next_char = line[col('.')-1]
   end
 
-  if has_key(b:AutoPairs, next_char)
+  if has_key(b:AutoPairsDelete, next_char)
     let followed_open_pair = next_char
     let inputed_close_pair = current_char
-    let followed_close_pair = b:AutoPairs[next_char]
+    let followed_close_pair = b:AutoPairsDelete[next_char]
     if followed_close_pair != followed_open_pair
       " TODO replace system searchpair to skip string and nested pair.
       " eg: (|){"hello}world"} will transform to ({"hello})world"}
@@ -449,6 +453,10 @@ function! AutoPairsInit()
 
   if !exists('b:AutoPairs')
     let b:AutoPairs = g:AutoPairs
+  end
+
+  if !exists('b:AutoPairsDelete')
+    let b:AutoPairsDelete = g:AutoPairsDelete
   end
 
   if !exists('b:AutoPairsMoveCharacter')

@@ -203,6 +203,15 @@ To append new pairs without overwriting defaults, add values in your `.vimrc`.:
 This example will enable matching of `<` with `>`.
 
 
+                                                           *g:AutoPairsDelete*
+|g:AutoPairsDelete|                                                       dict
+
+Default: >
+Uses g:AutoPairs
+
+Specifies which symbols should be automatically paired for deletion.
+
+
                                                                   *b:AutoPairs*
 |b:AutoPairs|                                                              dict
 
