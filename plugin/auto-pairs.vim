@@ -20,6 +20,14 @@ if !exists('g:AutoPairsParens')
   let g:AutoPairsParens = {'(':')', '[':']', '{':'}'}
 end
 
+if !exists('g:AutoPairsEnableParensDecorators')
+  let g:AutoPairsEnableParensDecorators = 0
+end
+
+if !exists('g:AutoPairsParensDecorators')
+  let g:AutoPairsParensDecorators = {'%':'%', '#':'#', '=':'='}
+end
+
 if !exists('g:AutoPairsMapBS')
   let g:AutoPairsMapBS = 1
 end
@@ -245,7 +253,7 @@ function! AutoPairsDelete()
   endif
 
   " Delete Repeated Pair eg: '''|''' [[|]] {{|}}
-  if has_key(b:AutoPairs, prev_char)
+  if (has_key(b:AutoPairs, prev_char) || has_key(b:AutoPairsParensDecorators, prev_char))
     let times = 0
     let p = -1
     while get(prev_chars, p, '') == prev_char
@@ -253,7 +261,11 @@ function! AutoPairsDelete()
       let times = times + 1
     endwhile
 
-    let close = b:AutoPairs[prev_char]
+    if has_key(b:AutoPairs, prev_char)
+      let close = b:AutoPairs[prev_char]
+    else
+      let close = b:AutoPairsParensDecorators[prev_char]
+    endif
     let left = repeat(prev_char, times)
     let right = repeat(close, times)
 
@@ -413,15 +425,20 @@ function! AutoPairsReturn()
   return ''
 endfunction
 
-function! AutoPairsSpace()
+function! AutoPairsDecorator(decorator, closing)
   let line = getline('.')
   let prev_char = line[col('.')-2]
   let cmd = ''
-  let cur_char =line[col('.')-1]
-  if has_key(g:AutoPairsParens, prev_char) && g:AutoPairsParens[prev_char] == cur_char
-    let cmd = "\<SPACE>".s:Left
+  let cur_char = line[col('.')-1]
+  if ((has_key(g:AutoPairsParens, prev_char) && g:AutoPairsParens[prev_char] == cur_char)
+        \|| (has_key(b:AutoPairsParensDecorators, prev_char) && b:AutoPairsParensDecorators[prev_char] == cur_char))
+    let cmd = a:closing.s:Left
   endif
-  return "\<SPACE>".cmd
+  return a:decorator.cmd
+endfunction
+
+function! AutoPairsSpace()
+  return AutoPairsDecorator("\<SPACE>", "\<SPACE>")
 endfunction
 
 function! AutoPairsBackInsert()
@@ -443,6 +460,10 @@ function! AutoPairsInit()
 
   if !exists('b:AutoPairs')
     let b:AutoPairs = g:AutoPairs
+  end
+
+  if !exists('b:AutoPairsParensDecorators')
+    let b:AutoPairsParensDecorators = g:AutoPairsParensDecorators
   end
 
   if !exists('b:AutoPairsMoveCharacter')
@@ -480,6 +501,13 @@ function! AutoPairsInit()
       let do_abbrev = "<C-]>"
     endif
     execute 'inoremap <buffer> <silent> <SPACE> '.do_abbrev.'<C-R>=AutoPairsSpace()<CR>'
+  end
+
+  if g:AutoPairsEnableParensDecorators
+    let decorators = items(b:AutoPairsParensDecorators)
+    for decorator in decorators
+      execute 'inoremap <buffer> <silent> '.decorator[0]." <C-R>=AutoPairsDecorator('".decorator[0]."', '".decorator[1]."')<CR>"
+    endfor
   end
 
   if g:AutoPairsShortcutFastWrap != ''

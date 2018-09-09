@@ -40,6 +40,14 @@ Features
         input: '|' (press <SPACE> at |)
         output: ' |'
 
+*   Insert Parens decorators for [], (), {}. Useful for templating languages such as [Jinja](http://jinja.pocoo.org/)/[Twig](twig.sensiolabs.org)/[Liquid](https://github.com/Shopify/liquid)
+
+        input: {|} (press % at |)
+        output {%|%}
+
+        input: {|} (press #<SPACE>foo at |)
+        output {# foo| #}
+
 *   Skip ' when inside a word
 
         input: foo| (press ' at |)
@@ -182,6 +190,30 @@ Options
         Default: g:AutoPairs
 
         Buffer level pairs set.
+
+*   g:AutoPairsEnableParensDecorators
+
+        Default: 0
+
+        Enables parens decorators, such as %, #, =.
+
+*   g:AutoPairsParens
+
+        Default: {'(':')', '[':']', '{':'}'}
+
+        Which pairs should be considered paren.
+
+*   g:AutoPairsParensDecorators
+
+        Default: {'%':'%', '#':'#', '=':'='}
+
+        Parens decorator value pairs.
+
+*   b:AutoPairsParensDecorators
+
+        Default: g:AutoPairsParensDecorators
+
+        Buffer level parens decorator set.
 
 *   g:AutoPairsShortcutToggle
 
