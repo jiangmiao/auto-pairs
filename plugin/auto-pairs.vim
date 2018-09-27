@@ -16,6 +16,10 @@ if !exists('g:AutoPairs')
   let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 end
 
+if !exists('g:AutoPairsDelete')
+  let g:AutoPairsDelete = g:AutoPairs
+end
+
 if !exists('g:AutoPairsParens')
   let g:AutoPairsParens = {'(':')', '[':']', '{':'}'}
 end
@@ -78,6 +82,10 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsSkipCharacter')
+  let g:AutoPairsSkipCharacter = 1
+endif
+
 " 7.4.849 support <C-G>U to avoid breaking '.'
 " Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
 " Vim note: https://github.com/vim/vim/releases/tag/v7.4.849
@@ -124,31 +132,33 @@ function! AutoPairsInsert(key)
   if !has_key(b:AutoPairs, a:key)
     let b:autopairs_saved_pair = [a:key, getpos('.')]
 
-    " Skip the character if current character is the same as input
-    if current_char == a:key
-      return s:Right
-    end
-
-    if !g:AutoPairsFlyMode
-      " Skip the character if next character is space
-      if current_char == ' ' && next_char == a:key
-        return s:Right.s:Right
-      end
-
-      " Skip the character if closed pair is next character
-      if current_char == ''
-        if g:AutoPairsMultilineClose
-          let next_lineno = line('.')+1
-          let next_line = getline(nextnonblank(next_lineno))
-          let next_char = matchstr(next_line, '\s*\zs.')
-        else
-          let next_char = matchstr(line, '\s*\zs.')
+    if g:AutoPairsSkipCharacter
+        " Skip the character if current character is the same as input
+        if current_char == a:key
+          return s:Right
         end
-        if next_char == a:key
-          return "\<ESC>e^a"
+
+      if !g:AutoPairsFlyMode
+        " Skip the character if next character is space
+        if current_char == ' ' && next_char == a:key
+          return s:Right.s:Right
+        end
+
+        " Skip the character if closed pair is next character
+        if current_char == ''
+          if g:AutoPairsMultilineClose
+            let next_lineno = line('.')+1
+            let next_line = getline(nextnonblank(next_lineno))
+            let next_char = matchstr(next_line, '\s*\zs.')
+          else
+            let next_char = matchstr(line, '\s*\zs.')
+          end
+          if next_char == a:key
+            return "\<ESC>e^a"
+          endif
         endif
       endif
-    endif
+    end
 
     " Fly Mode, and the key is closed-pairs, search closed-pair and jump
     if g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
@@ -169,7 +179,7 @@ function! AutoPairsInsert(key)
   let open = a:key
   let close = b:AutoPairs[open]
 
-  if current_char == close && open == close
+  if current_char == close && open == close && g:AutoPairsSkipCharacter
     return s:Right
   end
 
@@ -180,7 +190,7 @@ function! AutoPairsInsert(key)
   end
 
   " support for ''' ``` and """
-  if open == close
+  if open == close && g:AutoPairsSkipCharacter
     " The key must be ' " `
     let pprev_char = line[col('.')-3]
     if pprev_char == open && prev_char == open
@@ -240,12 +250,12 @@ function! AutoPairsDelete()
   end
 
   " Delete last two spaces in parens, work with MapSpace
-  if has_key(b:AutoPairs, pprev_char) && prev_char == ' ' && current_char == ' '
+  if has_key(b:AutoPairsDelete, pprev_char) && prev_char == ' ' && current_char == ' '
     return "\<BS>\<DEL>"
   endif
 
   " Delete Repeated Pair eg: '''|''' [[|]] {{|}}
-  if has_key(b:AutoPairs, prev_char)
+  if has_key(b:AutoPairsDelete, prev_char)
     let times = 0
     let p = -1
     while get(prev_chars, p, '') == prev_char
@@ -253,7 +263,7 @@ function! AutoPairsDelete()
       let times = times + 1
     endwhile
 
-    let close = b:AutoPairs[prev_char]
+    let close = b:AutoPairsDelete[prev_char]
     let left = repeat(prev_char, times)
     let right = repeat(close, times)
 
@@ -265,8 +275,8 @@ function! AutoPairsDelete()
   end
 
 
-  if has_key(b:AutoPairs, prev_char)
-    let close = b:AutoPairs[prev_char]
+  if has_key(b:AutoPairsDelete, prev_char)
+    let close = b:AutoPairsDelete[prev_char]
     if match(line,'^\s*'.close, col('.')-1) != -1
       " Delete (|___)
       let space = matchstr(line, '^\s*', col('.')-1)
@@ -333,10 +343,10 @@ function! AutoPairsFastWrap()
     let next_char = line[col('.')-1]
   end
 
-  if has_key(b:AutoPairs, next_char)
+  if has_key(b:AutoPairsDelete, next_char)
     let followed_open_pair = next_char
     let inputed_close_pair = current_char
-    let followed_close_pair = b:AutoPairs[next_char]
+    let followed_close_pair = b:AutoPairsDelete[next_char]
     if followed_close_pair != followed_open_pair
       " TODO replace system searchpair to skip string and nested pair.
       " eg: (|){"hello}world"} will transform to ({"hello})world"}
@@ -443,6 +453,10 @@ function! AutoPairsInit()
 
   if !exists('b:AutoPairs')
     let b:AutoPairs = g:AutoPairs
+  end
+
+  if !exists('b:AutoPairsDelete')
+    let b:AutoPairsDelete = g:AutoPairsDelete
   end
 
   if !exists('b:AutoPairsMoveCharacter')

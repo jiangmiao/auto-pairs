@@ -264,6 +264,12 @@ Options
         Map <M-(> <M-)> <M-[> <M-]> <M-{> <M-}> <M-"> <M-'> to
         move character under the cursor to the pair.
 
+*   g:AutoPairsSkipCharacter
+
+        Default : 1
+
+        set it to 0 to disable skipping characters
+
 Buffer Level Pairs Setting
 --------------------------
 
