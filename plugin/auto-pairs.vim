@@ -78,6 +78,10 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsCarryOnReturn')
+  let g:AutoPairsCarryOnReturn = 0
+endif
+
 " 7.4.849 support <C-G>U to avoid breaking '.'
 " Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
 " Vim note: https://github.com/vim/vim/releases/tag/v7.4.849
@@ -89,6 +93,8 @@ endif
 
 let s:Left = s:Go."\<LEFT>"
 let s:Right = s:Go."\<RIGHT>"
+
+let s:AutoPairsCarryFlag = 1
 
 
 " Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
@@ -164,6 +170,9 @@ function! AutoPairsInsert(key)
 
     " Insert directly if the key is not an open key
     return a:key
+  else
+    " We open
+    let s:AutoPairsCarryFlag = 1
   end
 
   let open = a:key
@@ -395,20 +404,60 @@ function! AutoPairsReturn()
       let cmd = "zz"
     end
 
+    let ret = ''
+
+    " carry only if enabled and if we broke line inbetween parens
+    let carry = g:AutoPairsCarryOnReturn && has_key(g:AutoPairsParens, prev_char)
+
+    " carry only if carry flag is on (user has just opened a new set of parens)
+    if !s:AutoPairsCarryFlag
+      let carry = 0
+    endif
+
+    if carry
+      " make sure we carry only if trimmed line contains anything other
+      " than cur_char
+      let c1 = substitute(line, '^\s*\(.\{-}\)\s*$', '\1', '') != cur_char
+
+      " do not carry if we are in the middle of wrapping parens
+      let pline = strpart(pline, 0, strlen(pline) - 1)
+      let r1 = substitute(pline, '[^(]', '', 'g')
+      let r2 = substitute(pline, '[^)]', '', 'g')
+      let s1 = substitute(pline, '[^\[]', '', 'g')
+      let s2 = substitute(pline, '[^\]]', '', 'g')
+      let q1 = substitute(pline, '[^{]', '', 'g')
+      let q2 = substitute(pline, '[^}]', '', 'g')
+
+      let c2 = strlen(r1) == strlen(r2) && strlen(s1) == strlen(s2) && strlen(q1) == strlen(q2)
+
+      let carry = c1 && c2
+    endif
+
+    if carry
+      " remove-copy everything after the cur_char
+      let ret .= "\<ESC>^lD"
+    endif
+
     " If equalprg has been set, then avoid call =
     " https://github.com/jiangmiao/auto-pairs/issues/24
     if &equalprg != ''
-      return "\<ESC>".cmd."O"
-    endif
+      let ret .= "\<ESC>".cmd."O"
 
     " conflict with javascript and coffee
     " javascript   need   indent new line
     " coffeescript forbid indent new line
-    if &filetype == 'coffeescript' || &filetype == 'coffee'
-      return "\<ESC>".cmd."k==o"
+    elseif &filetype == 'coffeescript' || &filetype == 'coffee'
+      let ret .= "\<ESC>".cmd."k==o"
     else
-      return "\<ESC>".cmd."=ko"
+      let ret .= "\<ESC>".cmd."=ko"
     endif
+
+    if carry
+      " paste copied fragment back onto line, format, remain in normal mode
+      let ret .= "\<ESC>p=="
+    endif
+
+    return ret
   end
   return ''
 endfunction
@@ -580,3 +629,4 @@ imap <script> <Plug>AutoPairsReturn <SID>AutoPairsReturn
 
 
 au BufEnter * :call AutoPairsTryInit()
+au InsertLeave * :let s:AutoPairsCarryFlag=0
