@@ -156,7 +156,13 @@ function! AutoPairsInsert(key)
       if n != -1
         return repeat(s:Right, n+1)
       end
-      if search(a:key, 'W')
+      " Only fly on current line if AutoPairsMultilineClose is set to 0
+      if g:AutoPairsMultilineClose
+        let stopline = 0
+      else
+        let stopline = line('.')
+      endif
+      if search(a:key, 'W', stopline)
         " force break the '.' when jump to different line
         return "\<Right>"
       endif

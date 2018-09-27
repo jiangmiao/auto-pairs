@@ -250,6 +250,7 @@ Options
         When you press the key for the closing pair (e.g. `)`) it jumps past it.
         If set to 1, then it'll jump to the next line, if there is only whitespace.
         If set to 0, then it'll only jump to a closing pair on the same line.
+        If set to 0 with Fly Mode enabled, then it'll only fly on the current line.
 
 *   g:AutoPairsShortcutBackInsert
 
