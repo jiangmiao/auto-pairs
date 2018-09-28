@@ -179,6 +179,11 @@ function! AutoPairsInsert(key)
     return a:key
   end
 
+  " Disable auto close of ' and ` in Lisp and Scheme modes
+  if (&filetype == 'lisp' || &filetype == 'scheme') && ( a:key == "'" || a:key == '`' )
+    return a:key
+  end
+
   " support for ''' ``` and """
   if open == close
     " The key must be ' " `
