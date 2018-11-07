@@ -33,6 +33,10 @@ if !exists('g:AutoPairsMapCR')
   let g:AutoPairsMapCR = 1
 end
 
+if !exists('g:AutoPairsCRKey')
+  let g:AutoPairsCRKey = '<CR>'
+end
+
 if !exists('g:AutoPairsMapSpace')
   let g:AutoPairsMapSpace = 1
 end
@@ -568,7 +572,7 @@ function! AutoPairsTryInit()
         let old_cr = wrapper_name
       end
       " Always silent mapping
-      execute 'inoremap <script> <buffer> <silent> <CR> '.old_cr.'<SID>AutoPairsReturn'
+      execute 'inoremap <script> <buffer> <silent> ' .g:AutoPairsCRKey. ' ' .old_cr.'<SID>AutoPairsReturn'
     end
   endif
   call AutoPairsInit()
