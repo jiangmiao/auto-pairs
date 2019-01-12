@@ -501,6 +501,20 @@ function! AutoPairsInit()
     execute 'noremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' :call AutoPairsJump()<CR>'
   end
 
+  if &keymap != ''
+    let l:imsearch = &imsearch
+    let l:iminsert = &iminsert
+    let l:imdisable = &imdisable
+    execute 'setlocal keymap=' . &keymap
+    execute 'setlocal imsearch=' . l:imsearch
+    execute 'setlocal iminsert=' . l:iminsert
+    if l:imdisable
+      execute 'setlocal imdisable'
+    else
+      execute 'setlocal noimdisable'
+    end
+  end
+
 endfunction
 
 function! s:ExpandMap(map)
