@@ -185,7 +185,7 @@ func! AutoPairsInsert(key)
       " process the open pair
       
       " remove inserted pair
-      " if the pairs include < > and  <!-- --> 
+      " eg: if the pairs include < > and  <!-- --> 
       " when <!-- is detected the inserted pair < > should be clean up 
       let bs = repeat("\<BS>", s:ulen(m)-1)
       if bs != ''
@@ -199,10 +199,6 @@ func! AutoPairsInsert(key)
 
   " Fly Mode, and the key is closed-pairs, search closed-pair and jump
   if g:AutoPairsFlyMode &&  a:key =~ '\v[\}\]\)]'
-    let n = stridx(after, a:key)
-    if n != -1
-      return repeat(s:Right, n+1)
-    end
     if search(a:key, 'We')
       return "\<Right>"
     endif
@@ -230,6 +226,7 @@ endf
 
 " Fast wrap the word in brackets
 func! AutoPairsFastWrap()
+  let c = @"
   normal! x
   let [before, after] = s:getline()
   if after[0] =~ '\v[\{\[\(]'
@@ -239,6 +236,7 @@ func! AutoPairsFastWrap()
     normal! e
     normal! p
   end
+  let @" = c
   return ""
 endf
 
