@@ -198,10 +198,10 @@ func! AutoPairsInsert(key)
         end
       end
       if open != close
-        let m = s:matchend(after, '^\v\s*\zs\V'.close)
-        if len(m) > 0
+        let m = matchstr(after, '^\v\s*\zs\V'.close)
+        if m != ''
           " skip close pair greedy
-          call search(m[1], 'We')
+          call search(m, 'We')
           return "\<Right>"
         end
       end
@@ -283,6 +283,15 @@ func! AutoPairsDelete()
         end
       end
       return repeat("\<BS>", s:ulen(b)).repeat("\<DELETE>", s:ulen(a))
+    end
+  endfor
+
+  return "\<BS>"
+  " delete the pair foo[]| <BS> to foo
+  for [open, close] in b:AutoPairsList
+    let m = s:matchend(before, '\V'.open.'\v\s*'.'\V'.close.'\v$')
+    if len(m) > 0
+      return s:backspace(m[2])
     end
   endfor
   return "\<BS>"
