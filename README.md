@@ -89,24 +89,10 @@ Features
 
         }|
 
-*   Support ``` ''' and """
-
-        input:
-            '''
-
-        output:
-            '''|'''
-
-*   Delete Repeated Pairs in one time
-
-        input: """|""" (press <BS> at |)
-        output: |
-
-        input: {{|}} (press <BS> at |)
-        output: |
-
-        input: [[[[[[|]]]]]] (press <BS> at |)
-        output: |
+*  Multibyte Pairs
+        
+        Support any multibyte pairs such as <!-- -->, <% %>, """ """
+        See multibyte pairs section for details
 
 *  Fly Mode
 
@@ -297,6 +283,88 @@ TroubleShooting
 
     Because AutoPairs uses Meta(Alt) key as shortcut, it is conflict with some Swedish character such as å.
     To fix the issue, you need remap or disable the related shortcut.
+
+Multibyte Pairs
+---------------
+
+    The default pairs is {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
+    You could also define multibyte pairs such as <!-- -->, <% %> and so on
+
+    Here are some examples
+
+* General usage
+
+    au FileType php      let b:AutoPairs = AutoPairsDefine({'<?' : '?>', '<?php': '?>'})
+
+    the first key of closed pair ? will be mapped
+
+    pairs: '<?' : '?>', '<?php': '?>'
+    input: <?
+    output: <?|?>
+
+    input: <?php
+    output: <?php|?>
+
+    input: he<?php|?> (press <BS> at|)
+    output: he|
+
+    input: <?php|?> (press ? at|)
+    output: <?php?>|
+
+    pair: '[[':']]'
+    input: [[|]] (press <BR>)
+    output: | ([[ and ]] will be deleted the [['s priority is higher than [ for it's longer)
+
+* Modifier
+
+    The text after //  in close pair is modifiers
+
+    n - do not map the first charactor of closed pair
+
+    for 'begin' 'end' pair, e is a charactor, if map e to jump will be annoy, so use modifier 'n' to skip key map
+
+    au FileType ruby     let b:AutoPairs = AutoPairsDefine({'begin': 'end//n]'})
+
+
+    input: begin
+    output: begin|end
+
+    input: begin|end (press <BR> on |)
+    output: |
+
+    input: begin|end (press e on |)
+    output: begineend (will not jump for e is not mapped)
+
+* Advanced usage
+
+    au FileType rust     let b:AutoPairs = AutoPairsDefine({'\w\zs<': '>'})
+
+    if press < after a word will generate the pair
+
+    when use regexp MUST use \zs to prevent catching
+    if use '\w<' without \zs,  for text hello<|> press <BS> on | will output 'hell', the 'o' has been deleted
+
+    pair: '\w\zs<': '>'
+    input: h <
+    output: h <
+
+    input: h<
+    output: h<|>
+
+    input: h<|> press <BR>
+    output: h|
+
+    pair: '\ws<': '>' (WRONG pair which missed \zs)
+    input: h<|> press <BR>
+    output: | (charactor 'h' is deleted)
+
+
+    the 'begin' 'end' pair write in
+
+    au FileType ruby     let b:AutoPairs = AutoPairsDefine({'\v(^|[^\w])\zsbegin': 'end//n'})
+
+    will be better, only auto pair when at start of line or follow non-word text
+
 
 Known Issues
 -----------------------
