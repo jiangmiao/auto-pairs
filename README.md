@@ -300,7 +300,7 @@ Multibyte Pairs
         output: <?php?>|
 
         pair: '[[':']]'
-        input: [[|]] (press <BR>)
+        input: [[|]] (press <BS>)
         output: | ([[ and ]] will be deleted the [['s priority is higher than [ for it's longer)
 
 * Modifier
@@ -317,7 +317,7 @@ Multibyte Pairs
         input: begin
         output: begin|end
 
-        input: begin|end (press <BR> on |)
+        input: begin|end (press <BS> on |)
         output: |
 
         input: begin|end (press e on |)
@@ -339,11 +339,11 @@ Multibyte Pairs
         input: h<
         output: h<|>
 
-        input: h<|> press <BR>
+        input: h<|> press <BS>
         output: h|
 
         pair: '\ws<': '>' (WRONG pair which missed \zs)
-        input: h<|> press <BR>
+        input: h<|> press <BS>
         output: | (charactor 'h' is deleted)
 
 
