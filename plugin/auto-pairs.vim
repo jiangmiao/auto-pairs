@@ -336,7 +336,8 @@ func! AutoPairsReturn()
   let after = getline('.')
   let cmd = ''
   for [open, close] in b:AutoPairsList
-    if before =~ '\V'.open.'\v\s*$' && after =~ '^\s*\V'.close
+    "  before =~ '\V'.open.'\v\s*$' &&
+    if after =~ '^\s*\V'.close
       if g:AutoPairsCenterLine && winline() * 3 >= winheight(0) * 2
         " Recenter before adding new line to avoid replacing line content
         let cmd = "zz"
