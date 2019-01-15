@@ -29,6 +29,10 @@ if !exists('g:AutoPairsMapCR')
   let g:AutoPairsMapCR = 1
 end
 
+if !exists('g:AutoPairsWildClosedPair')
+  let g:AutoPairsWildClosedPair = ']'
+end
+
 if !exists('g:AutoPairsMapSpace')
   let g:AutoPairsMapSpace = 1
 end
@@ -87,8 +91,6 @@ let s:Left = s:Go."\<LEFT>"
 let s:Right = s:Go."\<RIGHT>"
 
 
-" Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
-let g:AutoPairsClosedPairs = {}
 
 
 " unicode len
@@ -132,6 +134,22 @@ func! s:getline()
   return [before, after]
 endf
 
+" split text to two part
+func! s:matchend(text, open)
+    let m = matchstr(a:text, '\V'.a:open.'\v$')
+    if m == ""
+      return []
+    end
+    return [a:text, strpart(a:text, 0, len(a:text)-len(m)), m]
+endf
+func! s:matchbegin(text, close)
+    let m = matchstr(a:text, '^\V'.a:close)
+    if m == ""
+      return []
+    end
+    return [a:text, m, strpart(a:text, len(m), len(a:text)-len(m))]
+endf
+
 " add or delete pairs base on g:AutoPairs
 " AutoPairsDefine(addPairs:dict[, removeOpenPairList:list])
 "
@@ -168,7 +186,7 @@ func! AutoPairsInsert(key)
   " check close pairs
   for [open, close] in b:AutoPairsList
     if close[0] == a:key
-      let m = matchlist(after, '\v^\s*(\V'.close.'\v)')
+      let m = s:matchbegin(after, '\v\s*\V'.close)
       if len(m) > 0
         " skip close pair
         call search(m[1], 'We')
@@ -180,18 +198,45 @@ func! AutoPairsInsert(key)
   " check open pairs
   let text=before.a:key
   for [open, close] in b:AutoPairsList
-    let m = matchstr(text, '\V'.open.'\v$')
-    if m != ''
+    let m = s:matchend(text, open)
+    if len(m) > 0
       " process the open pair
       
       " remove inserted pair
       " eg: if the pairs include < > and  <!-- --> 
       " when <!-- is detected the inserted pair < > should be clean up 
-      let bs = repeat("\<BS>", s:ulen(m)-1)
+      " <?php ?> should backspace 4 times php and <?
+      let target = m[1]
+      let openPair = m[2]
+      let text = before
+      let i = 0
+      while len(text) >= len(target) && target != text 
+        let found = 0
+        " delete pair
+        for [o, c] in b:AutoPairsList
+          let m = s:matchend(text, o)
+          if len(m) > 0
+            let found = 1
+            let text = m[1]
+            let i = i + 1
+            break
+          end
+        endfor
+        if !found
+          " delete charactor
+          let m = s:matchend(text, '\v.')
+          if len(m) == 0
+            break
+          end
+          let i = i + 1
+          let text = m[1]
+        end
+      endwhile
+      let bs = repeat("\<BS>", i)
       if bs != ''
         call feedkeys(bs)
       end
-      call feedkeys(m.close.s:left(close), "n")
+      call feedkeys(openPair.close.s:left(close), "n")
       return ""
       " return m.close.s:left(close)
     end
@@ -214,9 +259,16 @@ func! AutoPairsDelete()
 
   let [before, after] = s:getline()
   for [open, close] in b:AutoPairsList
-    let b = matchstr(before, '\V'.open.'\v\s*$')
-    let a = matchstr(after, '^\s*\V'.close)
+    let b = matchstr(before, '\V'.open.'\v\s?$')
+    let a = matchstr(after, '^\v\s*\V'.close)
     if b != '' && a != ''
+      if b[-1:-1] == ' '
+        if a[0] == ' '
+          return "\<BS>\<DELETE>"
+        else
+          return "\<BS>"
+        end
+      end
       return repeat("\<BS>", s:ulen(b)).repeat("\<DELETE>", s:ulen(a))
     end
   endfor
@@ -229,10 +281,18 @@ func! AutoPairsFastWrap()
   let c = @"
   normal! x
   let [before, after] = s:getline()
-  if after[0] =~ '\v[\{\[\(]'
+  if after[0] =~ '\v[\{\[\(\<]'
     normal! %
     normal! p
   else
+    for [open, close] in b:AutoPairsList
+      if after =~ '^\s*\V'.open
+        call search(close, 'We')
+        normal! p
+        let @" = c
+        return ""
+      end
+    endfor
     normal! e
     normal! p
   end
@@ -340,29 +400,39 @@ func! AutoPairsInit()
   if !exists('b:autopairs_enabled')
     let b:autopairs_enabled = 1
   end
-  let b:AutoPairsClosedPairs = {}
 
   if !exists('b:AutoPairs')
     let b:AutoPairs = g:AutoPairs
   end
-  " sort pairs by length, longer pair should have higher priority
-  let b:AutoPairsList = sort(items(b:AutoPairs), "s:sortByLength")
 
 
   if !exists('b:AutoPairsMoveCharacter')
     let b:AutoPairsMoveCharacter = g:AutoPairsMoveCharacter
   end
 
+  let b:AutoPairsList = []
+
   " buffer level map pairs keys
   for [open, close] in items(b:AutoPairs)
-    let open = open[len(open)-1]
-    let close = close[0]
-    call AutoPairsMap(open)
-    if open != close
-      call AutoPairsMap(close)
+    let o = open[len(open)-1]
+    let m = matchlist(close, '\v(.*)//(.*)$')
+    let mapclose = 1
+    if len(m) > 0 
+      if m[1] =~ 'n'
+        let mapclose = 0
+      end
+      let close = m[1]
     end
-    let b:AutoPairsClosedPairs[close] = open
+    let c = close[0]
+    call AutoPairsMap(o)
+    if o != c && mapclose
+      call AutoPairsMap(c)
+    end
+    let b:AutoPairsList += [[open, close]]
   endfor
+
+  " sort pairs by length, longer pair should have higher priority
+  let b:AutoPairsList = sort(b:AutoPairsList, "s:sortByLength")
 
   for key in split(b:AutoPairsMoveCharacter, '\s*')
     let escaped_key = substitute(key, "'", "''", 'g')
