@@ -1,8 +1,8 @@
 " Insert or delete brackets, parens, quotes in pairs.
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
-" Last Change:  2017-06-17
-" Version: 1.3.3
+" Last Change:  2019-01-15
+" Version: 2.0.0
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
 " License: MIT
@@ -16,10 +16,6 @@ if !exists('g:AutoPairs')
   let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
 end
 
-if !exists('g:AutoPairsParens')
-  let g:AutoPairsParens = {'(':')', '[':']', '{':'}'}
-end
-
 if !exists('g:AutoPairsMapBS')
   let g:AutoPairsMapBS = 1
 end
@@ -31,6 +27,10 @@ end
 
 if !exists('g:AutoPairsMapCR')
   let g:AutoPairsMapCR = 1
+end
+
+if !exists('g:AutoPairsWildClosedPair')
+  let g:AutoPairsWildClosedPair = ']'
 end
 
 if !exists('g:AutoPairsMapSpace')
@@ -91,278 +91,302 @@ let s:Left = s:Go."\<LEFT>"
 let s:Right = s:Go."\<RIGHT>"
 
 
-" Will auto generated {']' => '[', ..., '}' => '{'}in initialize.
-let g:AutoPairsClosedPairs = {}
 
 
-function! AutoPairsInsert(key)
-  if !b:autopairs_enabled
-    return a:key
-  end
+" unicode len
+func! s:ulen(s)
+  return len(split(a:s, '\zs'))
+endf
 
+func! s:left(s)
+  return repeat(s:Left, s:ulen(a:s))
+endf
+
+func! s:right(s)
+  return repeat(s:Right, s:ulen(a:s))
+endf
+
+func! s:delete(s)
+  return repeat("\<DEL>", s:ulen(a:s))
+endf
+
+func! s:backspace(s)
+  return repeat("\<BS>", s:ulen(a:s))
+endf
+
+func! s:getline()
   let line = getline('.')
   let pos = col('.') - 1
   let before = strpart(line, 0, pos)
   let after = strpart(line, pos)
-  let next_chars = split(after, '\zs')
-  let current_char = get(next_chars, 0, '')
-  let next_char = get(next_chars, 1, '')
-  let prev_chars = split(before, '\zs')
-  let prev_char = get(prev_chars, -1, '')
-
-  let eol = 0
-  if col('$') -  col('.') <= 1
-    let eol = 1
-  end
-
-  " Ignore auto close if prev character is \
-  if prev_char == '\'
-    return a:key
-  end
-
-  " The key is difference open-pair, then it means only for ) ] } by default
-  if !has_key(b:AutoPairs, a:key)
-    let b:autopairs_saved_pair = [a:key, getpos('.')]
-
-    " Skip the character if current character is the same as input
-    if current_char == a:key
-      return s:Right
-    end
-
-    " Skip the character if closed pair is next character
-    if current_char == ' ' && next_char == a:key
-      " Remove the space we added if the pair is empty
-      if has_key(b:AutoPairsClosedPairs, a:key)
-        let end_of_prevchar_index = matchend(before, '\S\ze\s*$')
-        if end_of_prevchar_index > -1
-          let end_of_prevchar = get(prev_chars, end_of_prevchar_index-1, '')
-          if end_of_prevchar == b:AutoPairsClosedPairs[a:key]
-            return "\<DEL>".s:Right
-          endif
-        endif
-      endif
-
-      return s:Right.s:Right
-    endif
-
-    if !g:AutoPairsFlyMode
-      " Skip the character if closed pair is next character
-      if current_char == ''
-        if g:AutoPairsMultilineClose
-          let next_lineno = line('.')+1
-          let next_line = getline(nextnonblank(next_lineno))
-          let next_char = matchstr(next_line, '\s*\zs.')
-        else
-          let next_char = matchstr(line, '\s*\zs.')
-        end
-        if next_char == a:key
-          return "\<ESC>e^a"
-        endif
-      endif
-    endif
-
-    " Fly Mode, and the key is closed-pairs, search closed-pair and jump
-    if g:AutoPairsFlyMode && has_key(b:AutoPairsClosedPairs, a:key)
-      let n = stridx(after, a:key)
-      if n != -1
-        return repeat(s:Right, n+1)
-      end
-      if search(a:key, 'W')
-        " force break the '.' when jump to different line
-        return "\<Right>"
-      endif
-    endif
-
-    " Insert directly if the key is not an open key
-    return a:key
-  end
-
-  let open = a:key
-  let close = b:AutoPairs[open]
-
-  if current_char == close && open == close
-    return s:Right
-  end
-
-  " Ignore auto close ' if follows a word
-  " MUST after closed check. 'hello|'
-  if a:key == "'" && prev_char =~ '\v\w'
-    return a:key
-  end
-
-  " support for ''' ``` and """
-  if open == close
-    " The key must be ' " `
-    let pprev_char = line[col('.')-3]
-    if pprev_char == open && prev_char == open
-      " Double pair found
-      return repeat(a:key, 4) . repeat(s:Left, 3)
-    end
-  end
-
-  let quotes_num = 0
-  " Ignore comment line for vim file
-  if &filetype == 'vim' && a:key == '"'
-    if before =~ '^\s*$'
-      return a:key
-    end
-    if before =~ '^\s*"'
-      let quotes_num = -1
-    end
-  end
-
-  " Keep quote number is odd.
-  " Because quotes should be matched in the same line in most of situation
-  if g:AutoPairsSmartQuotes && open == close
-    " Remove \\ \" \'
-    let cleaned_line = substitute(line, '\v(\\.)', '', 'g')
-    let n = quotes_num
-    let pos = 0
-    while 1
-      let pos = stridx(cleaned_line, open, pos)
-      if pos == -1
+  let afterline = after
+  if a:0 == 0 && g:AutoPairsMultilineClose
+    let n = line('$')
+    let i = line('.')+1
+    while i <= n
+      let line = getline(i)
+      let after = after.' '.line
+      if !(line =~ '\v^\s*$')
         break
       end
-      let n = n + 1
-      let pos = pos + 1
+      let i = i+1
     endwhile
-    if n % 2 == 1
-      return a:key
+  end
+  return [before, after, afterline]
+endf
+
+" split text to two part
+func! s:matchend(text, open)
+    let m = matchstr(a:text, '\V'.a:open.'\v$')
+    if m == ""
+      return []
+    end
+    return [a:text, strpart(a:text, 0, len(a:text)-len(m)), m]
+endf
+func! s:matchbegin(text, close)
+    let m = matchstr(a:text, '^\V'.a:close)
+    if m == ""
+      return []
+    end
+    return [a:text, m, strpart(a:text, len(m), len(a:text)-len(m))]
+endf
+
+" add or delete pairs base on g:AutoPairs
+" AutoPairsDefine(addPairs:dict[, removeOpenPairList:list])
+"
+" eg:
+"   au FileType html let b:AutoPairs = AutoPairsDefine({'<!--' : '-->'}, ['{'])
+"   add <!-- --> pair and remove '{' for html file
+func! AutoPairsDefine(pairs, ...)
+  let r = copy(g:AutoPairs)
+  for [open, close] in items(a:pairs)
+    let r[open] = close
+  endfor
+  if a:0 > 1
+    for open in a:1
+      unlet r[open]
+    endfor
+  end
+  return r
+endf
+
+func! AutoPairsInsert(key)
+  if !b:autopairs_enabled
+    return a:key
+  end
+
+  let b:autopairs_saved_pair = [a:key, getpos('.')]
+
+  let [before, after, afterline] = s:getline()
+
+  " Ignore auto close if prev character is \
+  if before[-1:-1] == '\'
+    return a:key
+  end
+
+  " check close pairs
+  for [open, close] in b:AutoPairsList
+    if a:key == g:AutoPairsWildClosedPair || close[0] == a:key
+      " the close pair is in the same line
+      let m = matchstr(afterline, '^\v\s*\V'.close)
+      if m != ''
+        if before =~ '\V'.open.'\v\s*$' && m[0] =~ '\v\s'
+          " remove the space we inserted if the text in pairs is blank
+          return "\<DEL>".s:right(m[1:])
+        else
+          return s:right(m)
+        end
+      end
+      if open != close
+        let m = s:matchend(after, '^\v\s*\zs\V'.close)
+        if len(m) > 0
+          " skip close pair greedy
+          call search(m[1], 'We')
+          return "\<Right>"
+        end
+      end
+    end
+  endfor
+
+  " check open pairs
+  let text=before.a:key
+  for [open, close] in b:AutoPairsList
+    let m = s:matchend(text, open)
+    if len(m) > 0
+      " process the open pair
+      
+      " remove inserted pair
+      " eg: if the pairs include < > and  <!-- --> 
+      " when <!-- is detected the inserted pair < > should be clean up 
+      " <?php ?> should backspace 4 times php and <?
+      let target = m[1]
+      let openPair = m[2]
+      let text = before
+      let i = 0
+      while len(text) >= len(target) && target != text 
+        let found = 0
+        " delete pair
+        for [o, c] in b:AutoPairsList
+          let m = s:matchend(text, o)
+          if len(m) > 0
+            let found = 1
+            let text = m[1]
+            let i = i + 1
+            break
+          end
+        endfor
+        if !found
+          " delete charactor
+          let m = s:matchend(text, '\v.')
+          if len(m) == 0
+            break
+          end
+          let i = i + 1
+          let text = m[1]
+        end
+      endwhile
+      let bs = repeat("\<BS>", i)
+      if bs != ''
+        call feedkeys(bs)
+      end
+      call feedkeys(openPair.close.s:left(close), "n")
+      return ""
+      " return m.close.s:left(close)
+    end
+  endfor
+
+  " Fly Mode, and the key is closed-pairs, search closed-pair and jump
+  if g:AutoPairsFlyMode &&  a:key =~ '\v[\}\]\)]'
+    if search(a:key, 'We')
+      return "\<Right>"
     endif
   endif
 
-  return open.close.s:Left
-endfunction
+  return a:key
+endf
 
-function! AutoPairsDelete()
+func! AutoPairsDelete()
   if !b:autopairs_enabled
     return "\<BS>"
   end
 
-  let line = getline('.')
-  let pos = col('.') - 1
-  let current_char = get(split(strpart(line, pos), '\zs'), 0, '')
-  let prev_chars = split(strpart(line, 0, pos), '\zs')
-  let prev_char = get(prev_chars, -1, '')
-  let pprev_char = get(prev_chars, -2, '')
-
-  if pprev_char == '\'
-    return "\<BS>"
-  end
-
-  " Delete last two spaces in parens, work with MapSpace
-  if has_key(b:AutoPairs, pprev_char) && prev_char == ' ' && current_char == ' '
-    return "\<BS>\<DEL>"
-  endif
-
-  " Delete Repeated Pair eg: '''|''' [[|]] {{|}}
-  if has_key(b:AutoPairs, prev_char)
-    let times = 0
-    let p = -1
-    while get(prev_chars, p, '') == prev_char
-      let p = p - 1
-      let times = times + 1
-    endwhile
-
-    let close = b:AutoPairs[prev_char]
-    let left = repeat(prev_char, times)
-    let right = repeat(close, times)
-
-    let before = strpart(line, pos-times, times)
-    let after  = strpart(line, pos, times)
-    if left == before && right == after
-      return repeat("\<BS>\<DEL>", times)
-    end
-  end
-
-
-  if has_key(b:AutoPairs, prev_char)
-    let close = b:AutoPairs[prev_char]
-    if match(line,'^\s*'.close, col('.')-1) != -1
-      " Delete (|___)
-      let space = matchstr(line, '^\s*', col('.')-1)
-      return "\<BS>". repeat("\<DEL>", len(space)+1)
-    elseif match(line, '^\s*$', col('.')-1) != -1
-      " Delete (|__\n___)
-      let nline = getline(line('.')+1)
-      if nline =~ '^\s*'.close
-        if &filetype == 'vim' && prev_char == '"'
-          " Keep next line's comment
+  let [before, after, ig] = s:getline()
+  for [open, close] in b:AutoPairsList
+    let b = matchstr(before, '\V'.open.'\v\s?$')
+    let a = matchstr(after, '^\v\s*\V'.close)
+    if b != '' && a != ''
+      if b[-1:-1] == ' '
+        if a[0] == ' '
+          return "\<BS>\<DELETE>"
+        else
           return "\<BS>"
         end
-
-        let space = matchstr(nline, '^\s*')
-        return "\<BS>\<DEL>". repeat("\<DEL>", len(space)+1)
       end
+      return repeat("\<BS>", s:ulen(b)).repeat("\<DELETE>", s:ulen(a))
     end
-  end
-
+  endfor
   return "\<BS>"
-endfunction
-
-function! AutoPairsJump()
-  call search('["\]'')}]','W')
-endfunction
-" string_chunk cannot use standalone
-let s:string_chunk = '\v%(\\\_.|[^\1]|[\r\n]){-}'
-let s:ss_pattern = '\v''' . s:string_chunk . ''''
-let s:ds_pattern = '\v"'  . s:string_chunk . '"'
-
-func! s:RegexpQuote(str)
-  return substitute(a:str, '\v[\[\{\(\<\>\)\}\]]', '\\&', 'g')
 endf
 
-func! s:RegexpQuoteInSquare(str)
-  return substitute(a:str, '\v[\[\]]', '\\&', 'g')
-endf
-
-" Search next open or close pair
-func! s:FormatChunk(open, close)
-  let open = s:RegexpQuote(a:open)
-  let close = s:RegexpQuote(a:close)
-  let open2 = s:RegexpQuoteInSquare(a:open)
-  let close2 = s:RegexpQuoteInSquare(a:close)
-  if open == close
-    return '\v'.open.s:string_chunk.close
-  else
-    return '\v%(' . s:ss_pattern . '|' . s:ds_pattern . '|' . '[^'.open2.close2.']|[\r\n]' . '){-}(['.open2.close2.'])'
-  end
-endf
 
 " Fast wrap the word in brackets
-function! AutoPairsFastWrap()
-  let line = getline('.')
-  let current_char = line[col('.')-1]
-  let next_char = line[col('.')]
-  let open_pair_pattern = '\v[({\[''"]'
-  let at_end = col('.') >= col('$') - 1
+func! AutoPairsFastWrap()
+  let c = @"
   normal! x
-  " Skip blank
-  if next_char =~ '\v\s' || at_end
-    call search('\v\S', 'W')
-    let line = getline('.')
-    let next_char = line[col('.')-1]
-  end
-
-  if has_key(b:AutoPairs, next_char)
-    let followed_open_pair = next_char
-    let inputed_close_pair = current_char
-    let followed_close_pair = b:AutoPairs[next_char]
-    if followed_close_pair != followed_open_pair
-      " TODO replace system searchpair to skip string and nested pair.
-      " eg: (|){"hello}world"} will transform to ({"hello})world"}
-      call searchpair('\V'.followed_open_pair, '', '\V'.followed_close_pair, 'W')
-    else
-      call search(s:FormatChunk(followed_open_pair, followed_close_pair), 'We')
-    end
-    return s:Right.inputed_close_pair.s:Left
+  let [before, after, ig] = s:getline()
+  if after[0] =~ '\v[\{\[\(\<]'
+    normal! %
+    normal! p
   else
-    normal! he
-    return s:Right.current_char.s:Left
+    for [open, close] in b:AutoPairsList
+      if after =~ '^\s*\V'.open
+        call search(close, 'We')
+        normal! p
+        let @" = c
+        return ""
+      end
+    endfor
+    if after[1:1] =~ '\v[a-zA-Z0-9_]'
+      normal! e
+      normal! p
+    else
+      normal! p
+    end
   end
-endfunction
+  let @" = c
+  return ""
+endf
 
-function! AutoPairsMap(key)
+func! AutoPairsJump()
+  call search('["\]'')}]','W')
+endf
+
+func! AutoPairsMoveCharacter(key)
+  let c = getline(".")[col(".")-1]
+  let escaped_key = substitute(a:key, "'", "''", 'g')
+  return "\<DEL>\<ESC>:call search("."'".escaped_key."'".")\<CR>a".c."\<LEFT>"
+endf
+
+func! AutoPairsBackInsert()
+  if exists('b:autopairs_saved_pair')
+    let pair = b:autopairs_saved_pair[0]
+    let pos  = b:autopairs_saved_pair[1]
+    call setpos('.', pos)
+    return pair
+  endif
+  return ''
+endf
+
+func! AutoPairsReturn()
+  if b:autopairs_enabled == 0
+    return ''
+  end
+  let before = getline(line('.')-1)
+  let after = getline('.')
+  let cmd = ''
+  for [open, close] in b:AutoPairsList
+    "  before =~ '\V'.open.'\v\s*$' &&
+    if after =~ '^\s*\V'.close
+      if g:AutoPairsCenterLine && winline() * 3 >= winheight(0) * 2
+        " Recenter before adding new line to avoid replacing line content
+        let cmd = "zz"
+      end
+
+      " If equalprg has been set, then avoid call =
+      " https://github.com/jiangmiao/auto-pairs/issues/24
+      if &equalprg != ''
+        return "\<ESC>".cmd."O"
+      endif
+
+      " conflict with javascript and coffee
+      " javascript   need   indent new line
+      " coffeescript forbid indent new line
+      if &filetype == 'coffeescript' || &filetype == 'coffee'
+        return "\<ESC>".cmd."k==o"
+      else
+        return "\<ESC>".cmd."=ko"
+      endif
+    end
+  endfor
+  return ''
+endf
+
+func! AutoPairsSpace()
+  if !b:autopairs_enabled
+    return "\<SPACE>"
+  end
+
+  let [before, after, ig] = s:getline()
+
+  for [open, close] in b:AutoPairsList
+    if before =~ '\V'.open.'\v$' && after =~ '^\V'.close
+      return "\<SPACE>\<SPACE>".s:Left
+    end
+  endfor
+  return "\<SPACE>"
+endf
+
+func! AutoPairsMap(key)
   " | is special key which separate map command from text
   let key = a:key
   if key == '|'
@@ -372,9 +396,9 @@ function! AutoPairsMap(key)
   " use expr will cause search() doesn't work
   execute 'inoremap <buffer> <silent> '.key." <C-R>=AutoPairsInsert('".escaped_key."')<CR>"
 
-endfunction
+endf
 
-function! AutoPairsToggle()
+func! AutoPairsToggle()
   if b:autopairs_enabled
     let b:autopairs_enabled = 0
     echo 'AutoPairs Disabled.'
@@ -383,91 +407,50 @@ function! AutoPairsToggle()
     echo 'AutoPairs Enabled.'
   end
   return ''
-endfunction
+endf
 
-function! AutoPairsMoveCharacter(key)
-  let c = getline(".")[col(".")-1]
-  let escaped_key = substitute(a:key, "'", "''", 'g')
-  return "\<DEL>\<ESC>:call search("."'".escaped_key."'".")\<CR>a".c."\<LEFT>"
-endfunction
+func! s:sortByLength(i1, i2)
+  return len(a:i2[0])-len(a:i1[0])
+endf
 
-function! AutoPairsReturn()
-  if b:autopairs_enabled == 0
-    return ''
-  end
-  let line = getline('.')
-  let pline = getline(line('.')-1)
-  let prev_char = pline[strlen(pline)-1]
-  let cmd = ''
-  let cur_char = line[col('.')-1]
-  if has_key(b:AutoPairs, prev_char) && b:AutoPairs[prev_char] == cur_char
-    if g:AutoPairsCenterLine && winline() * 3 >= winheight(0) * 2
-      " Recenter before adding new line to avoid replacing line content
-      let cmd = "zz"
-    end
-
-    " If equalprg has been set, then avoid call =
-    " https://github.com/jiangmiao/auto-pairs/issues/24
-    if &equalprg != ''
-      return "\<ESC>".cmd."O"
-    endif
-
-    " conflict with javascript and coffee
-    " javascript   need   indent new line
-    " coffeescript forbid indent new line
-    if &filetype == 'coffeescript' || &filetype == 'coffee'
-      return "\<ESC>".cmd."k==o"
-    else
-      return "\<ESC>".cmd."=ko"
-    endif
-  end
-  return ''
-endfunction
-
-function! AutoPairsSpace()
-  let line = getline('.')
-  let prev_char = line[col('.')-2]
-  let cmd = ''
-  let cur_char =line[col('.')-1]
-  if has_key(g:AutoPairsParens, prev_char) && g:AutoPairsParens[prev_char] == cur_char
-    let cmd = "\<SPACE>".s:Left
-  endif
-  return "\<SPACE>".cmd
-endfunction
-
-function! AutoPairsBackInsert()
-  if exists('b:autopairs_saved_pair')
-    let pair = b:autopairs_saved_pair[0]
-    let pos  = b:autopairs_saved_pair[1]
-    call setpos('.', pos)
-    return pair
-  endif
-  return ''
-endfunction
-
-function! AutoPairsInit()
+func! AutoPairsInit()
   let b:autopairs_loaded  = 1
   if !exists('b:autopairs_enabled')
     let b:autopairs_enabled = 1
   end
-  let b:AutoPairsClosedPairs = {}
 
   if !exists('b:AutoPairs')
     let b:AutoPairs = g:AutoPairs
   end
 
+
   if !exists('b:AutoPairsMoveCharacter')
     let b:AutoPairsMoveCharacter = g:AutoPairsMoveCharacter
   end
 
+  let b:AutoPairsList = []
+
   " buffer level map pairs keys
   for [open, close] in items(b:AutoPairs)
-    call AutoPairsMap(open)
-    if open != close
-      call AutoPairsMap(close)
+    let o = open[len(open)-1]
+    let m = matchlist(close, '\v(.*)//(.*)$')
+    let mapclose = 1
+    if len(m) > 0 
+      if m[1] =~ 'n'
+        let mapclose = 0
+      end
+      let close = m[1]
     end
-    let b:AutoPairsClosedPairs[close] = open
+    let c = close[0]
+    call AutoPairsMap(o)
+    if o != c && c != '' && mapclose
+      call AutoPairsMap(c)
+    end
+    let b:AutoPairsList += [[open, close]]
   endfor
+
+  " sort pairs by length, longer pair should have higher priority
+  let b:AutoPairsList = sort(b:AutoPairsList, "s:sortByLength")
 
   for key in split(b:AutoPairsMoveCharacter, '\s*')
     let escaped_key = substitute(key, "'", "''", 'g')
@@ -512,15 +495,29 @@ function! AutoPairsInit()
     execute 'noremap <buffer> <silent> ' . g:AutoPairsShortcutJump. ' :call AutoPairsJump()<CR>'
   end
 
-endfunction
+  if &keymap != ''
+    let l:imsearch = &imsearch
+    let l:iminsert = &iminsert
+    let l:imdisable = &imdisable
+    execute 'setlocal keymap=' . &keymap
+    execute 'setlocal imsearch=' . l:imsearch
+    execute 'setlocal iminsert=' . l:iminsert
+    if l:imdisable
+      execute 'setlocal imdisable'
+    else
+      execute 'setlocal noimdisable'
+    end
+  end
 
-function! s:ExpandMap(map)
+endf
+
+func! s:ExpandMap(map)
   let map = a:map
   let map = substitute(map, '\(<Plug>\w\+\)', '\=maparg(submatch(1), "i")', 'g')
   return map
-endfunction
+endf
 
-function! AutoPairsTryInit()
+func! AutoPairsTryInit()
   if exists('b:autopairs_loaded')
     return
   end
@@ -583,7 +580,7 @@ function! AutoPairsTryInit()
     end
   endif
   call AutoPairsInit()
-endfunction
+endf
 
 " Always silent the command
 inoremap <silent> <SID>AutoPairsReturn <C-R>=AutoPairsReturn()<CR>
