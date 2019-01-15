@@ -2,7 +2,7 @@
 " Maintainer:	JiangMiao <jiangfriend@gmail.com>
 " Contributor: camthompson
 " Last Change:  2019-01-15
-" Version: 1.3.4
+" Version: 2.0.0
 " Homepage: http://www.vim.org/scripts/script.php?script_id=3599
 " Repository: https://github.com/jiangmiao/auto-pairs
 " License: MIT
@@ -185,8 +185,8 @@ func! AutoPairsInsert(key)
 
   " check close pairs
   for [open, close] in b:AutoPairsList
-    if close[0] == a:key
-      let m = s:matchbegin(after, '\v\s*\V'.close)
+    if a:key == g:AutoPairsWildClosedPair || close[0] == a:key
+      let m = s:matchbegin(after, '\v\s*\zs\V'.close)
       if len(m) > 0
         " skip close pair
         call search(m[1], 'We')

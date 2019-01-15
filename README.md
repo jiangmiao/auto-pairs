@@ -57,13 +57,6 @@ Features
 
 *   Fast Wrap
 
-        input: |'hello' (press (<M-e> at |)
-        output: ('hello')
-
-        wrap string, only support c style string
-        input: |'h\\el\'lo' (press (<M-e> at |)
-        output ('h\\ello\'')
-
         input: |[foo, bar()] (press (<M-e> at |)
         output: ([foo, bar()])
 
@@ -250,6 +243,13 @@ Options
         Map <M-(> <M-)> <M-[> <M-]> <M-{> <M-}> <M-"> <M-'> to
         move character under the cursor to the pair.
 
+*   g:AutoPairsWildClosedPair
+
+        Default: ']'
+
+        Jump over following closed pair
+        for pair {'begin': 'end//n]'}, e is not mapped, use wild closed pair ] to jump over 'end'
+
 Buffer Level Pairs Setting
 --------------------------
 
@@ -290,7 +290,13 @@ Multibyte Pairs
     The default pairs is {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`'}
     You could also define multibyte pairs such as <!-- -->, <% %> and so on
 
-    Here are some examples
+* Function AutoPairsDefine(addPairs:dict[, removeOpenPairList:list])
+
+    add or delete pairs base on g:AutoPairs
+
+    eg:
+        au FileType html let b:AutoPairs = AutoPairsDefine({'<!--' : '-->'}, ['{'])
+        add <!-- --> pair and remove '{' for html file
 
 * General usage
 
