@@ -4,6 +4,7 @@ Insert or delete brackets, parens, quotes in pair.
 
 Installation
 ------------
+
 copy plugin/auto-pairs.vim to ~/.vim/plugin
 
 or if you are using `pathogen`:
@@ -249,6 +250,7 @@ Options
 
         Jump over following closed pair
         for pair {'begin': 'end//n]'}, e is not mapped, use wild closed pair ] to jump over 'end'
+        use <M-b> to back insert ] after jumping
 
 Buffer Level Pairs Setting
 --------------------------
@@ -259,6 +261,7 @@ eg:
 
     " When the filetype is FILETYPE then make AutoPairs only match for parenthesis
     au Filetype FILETYPE let b:AutoPairs = {"(": ")"}
+    au FileType php      let b:AutoPairs = AutoPairsDefine({'<?' : '?>', '<?php': '?>'})
 
 TroubleShooting
 ---------------
@@ -297,6 +300,8 @@ Multibyte Pairs
     eg:
         au FileType html let b:AutoPairs = AutoPairsDefine({'<!--' : '-->'}, ['{'])
         add <!-- --> pair and remove '{' for html file
+
+    the pair implict start with \V, so if want to match start of line ^ should be write in \^ vim comment {'\^"': ''}
 
 * General usage
 
