@@ -114,12 +114,12 @@ func! s:backspace(s)
   return repeat("\<BS>", s:ulen(a:s))
 endf
 
-func! s:getline()
+func! s:getline(...)
   let line = getline('.')
   let pos = col('.') - 1
   let before = strpart(line, 0, pos)
   let after = strpart(line, pos)
-  if g:AutoPairsMultilineClose
+  if a:0 == 0 && g:AutoPairsMultilineClose
     let n = line('$')
     let i = line('.')+1
     while i <= n
@@ -186,6 +186,9 @@ func! AutoPairsInsert(key)
   " check close pairs
   for [open, close] in b:AutoPairsList
     if a:key == g:AutoPairsWildClosedPair || close[0] == a:key
+      if open == close
+        let [before, after] = s:getline(0)
+      end
       let m = s:matchbegin(after, '\v\s*\zs\V'.close)
       if len(m) > 0
         " skip close pair

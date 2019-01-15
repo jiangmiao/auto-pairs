@@ -342,7 +342,7 @@ Multibyte Pairs
         input: h<|> press <BS>
         output: h|
 
-        pair: '\ws<': '>' (WRONG pair which missed \zs)
+        pair: '\w<': '>' (WRONG pair which missed \zs)
         input: h<|> press <BS>
         output: | (charactor 'h' is deleted)
 
