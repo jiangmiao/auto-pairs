@@ -84,11 +84,6 @@ Features
 
         }|
 
-*  Multibyte Pairs
-        
-        Support any multibyte pairs such as <!-- -->, <% %>, """ """
-        See multibyte pairs section for details
-
 *  Fly Mode
 
         input: if(a[3)
@@ -117,6 +112,11 @@ Features
         }
 
         See Fly Mode section for details
+
+*  Multibyte Pairs
+        
+        Support any multibyte pairs such as <!-- -->, <% %>, """ """
+        See multibyte pairs section for details
 
 Fly Mode
 --------
@@ -264,30 +264,6 @@ eg:
     au Filetype FILETYPE let b:AutoPairs = {"(": ")"}
     au FileType php      let b:AutoPairs = AutoPairsDefine({'<?' : '?>', '<?php': '?>'})
 
-TroubleShooting
----------------
-    The script will remap keys ([{'"}]) <BS>,
-    If auto pairs cannot work, use :imap ( to check if the map is corrected.
-    The correct map should be <C-R>=AutoPairsInsert("\(")<CR>
-    Or the plugin conflict with some other plugins.
-    use command :call AutoPairsInit() to remap the keys.
-
-
-* How to insert parens purely
-
-    There are 3 ways
-
-    1. use Ctrl-V ) to insert paren without trigger the plugin.
-
-    2. use Alt-P to turn off the plugin.
-
-    3. use DEL or <C-O>x to delete the character insert by plugin.
-
-* Swedish Character Conflict
-
-    Because AutoPairs uses Meta(Alt) key as shortcut, it is conflict with some Swedish character such as å.
-    To fix the issue, you need remap or disable the related shortcut.
-
 Multibyte Pairs
 ---------------
 
@@ -377,6 +353,29 @@ Multibyte Pairs
 
         will be better, only auto pair when at start of line or follow non-word text
 
+TroubleShooting
+---------------
+    The script will remap keys ([{'"}]) <BS>,
+    If auto pairs cannot work, use :imap ( to check if the map is corrected.
+    The correct map should be <C-R>=AutoPairsInsert("\(")<CR>
+    Or the plugin conflict with some other plugins.
+    use command :call AutoPairsInit() to remap the keys.
+
+
+* How to insert parens purely
+
+    There are 3 ways
+
+    1. use Ctrl-V ) to insert paren without trigger the plugin.
+
+    2. use Alt-P to turn off the plugin.
+
+    3. use DEL or <C-O>x to delete the character insert by plugin.
+
+* Swedish Character Conflict
+
+    Because AutoPairs uses Meta(Alt) key as shortcut, it is conflict with some Swedish character such as å.
+    To fix the issue, you need remap or disable the related shortcut.
 
 Known Issues
 -----------------------
