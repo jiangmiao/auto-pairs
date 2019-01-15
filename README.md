@@ -296,86 +296,86 @@ Multibyte Pairs
 
 * Function AutoPairsDefine(addPairs:dict[, removeOpenPairList:list])
 
-    add or delete pairs base on g:AutoPairs
+        add or delete pairs base on g:AutoPairs
 
-    eg:
-        au FileType html let b:AutoPairs = AutoPairsDefine({'<!--' : '-->'}, ['{'])
-        add <!-- --> pair and remove '{' for html file
+        eg:
+            au FileType html let b:AutoPairs = AutoPairsDefine({'<!--' : '-->'}, ['{'])
+            add <!-- --> pair and remove '{' for html file
 
-    the pair implict start with \V, so if want to match start of line ^ should be write in \^ vim comment {'\^"': ''}
+        the pair implict start with \V, so if want to match start of line ^ should be write in \^ vim comment {'\^"': ''}
 
 * General usage
 
-    au FileType php      let b:AutoPairs = AutoPairsDefine({'<?' : '?>', '<?php': '?>'})
+        au FileType php      let b:AutoPairs = AutoPairsDefine({'<?' : '?>', '<?php': '?>'})
 
-    the first key of closed pair ? will be mapped
+        the first key of closed pair ? will be mapped
 
-    pairs: '<?' : '?>', '<?php': '?>'
-    input: <?
-    output: <?|?>
+        pairs: '<?' : '?>', '<?php': '?>'
+        input: <?
+        output: <?|?>
 
-    input: <?php
-    output: <?php|?>
+        input: <?php
+        output: <?php|?>
 
-    input: he<?php|?> (press <BS> at|)
-    output: he|
+        input: he<?php|?> (press <BS> at|)
+        output: he|
 
-    input: <?php|?> (press ? at|)
-    output: <?php?>|
+        input: <?php|?> (press ? at|)
+        output: <?php?>|
 
-    pair: '[[':']]'
-    input: [[|]] (press <BR>)
-    output: | ([[ and ]] will be deleted the [['s priority is higher than [ for it's longer)
+        pair: '[[':']]'
+        input: [[|]] (press <BR>)
+        output: | ([[ and ]] will be deleted the [['s priority is higher than [ for it's longer)
 
 * Modifier
 
-    The text after //  in close pair is modifiers
+        The text after //  in close pair is modifiers
 
-    n - do not map the first charactor of closed pair
+        n - do not map the first charactor of closed pair
 
-    for 'begin' 'end' pair, e is a charactor, if map e to jump will be annoy, so use modifier 'n' to skip key map
+        for 'begin' 'end' pair, e is a charactor, if map e to jump will be annoy, so use modifier 'n' to skip key map
 
-    au FileType ruby     let b:AutoPairs = AutoPairsDefine({'begin': 'end//n]'})
+        au FileType ruby     let b:AutoPairs = AutoPairsDefine({'begin': 'end//n]'})
 
 
-    input: begin
-    output: begin|end
+        input: begin
+        output: begin|end
 
-    input: begin|end (press <BR> on |)
-    output: |
+        input: begin|end (press <BR> on |)
+        output: |
 
-    input: begin|end (press e on |)
-    output: begineend (will not jump for e is not mapped)
+        input: begin|end (press e on |)
+        output: begineend (will not jump for e is not mapped)
 
 * Advanced usage
 
-    au FileType rust     let b:AutoPairs = AutoPairsDefine({'\w\zs<': '>'})
+        au FileType rust     let b:AutoPairs = AutoPairsDefine({'\w\zs<': '>'})
 
-    if press < after a word will generate the pair
+        if press < after a word will generate the pair
 
-    when use regexp MUST use \zs to prevent catching
-    if use '\w<' without \zs,  for text hello<|> press <BS> on | will output 'hell', the 'o' has been deleted
+        when use regexp MUST use \zs to prevent catching
+        if use '\w<' without \zs,  for text hello<|> press <BS> on | will output 'hell', the 'o' has been deleted
 
-    pair: '\w\zs<': '>'
-    input: h <
-    output: h <
+        pair: '\w\zs<': '>'
+        input: h <
+        output: h <
 
-    input: h<
-    output: h<|>
+        input: h<
+        output: h<|>
 
-    input: h<|> press <BR>
-    output: h|
+        input: h<|> press <BR>
+        output: h|
 
-    pair: '\ws<': '>' (WRONG pair which missed \zs)
-    input: h<|> press <BR>
-    output: | (charactor 'h' is deleted)
+        pair: '\ws<': '>' (WRONG pair which missed \zs)
+        input: h<|> press <BR>
+        output: | (charactor 'h' is deleted)
 
 
-    the 'begin' 'end' pair write in
+        the 'begin' 'end' pair write in
 
-    au FileType ruby     let b:AutoPairs = AutoPairsDefine({'\v(^|[^\w])\zsbegin': 'end//n'})
+        au FileType ruby     let b:AutoPairs = AutoPairsDefine({'\v(^|[^\w])\zsbegin': 'end//n'})
 
-    will be better, only auto pair when at start of line or follow non-word text
+        will be better, only auto pair when at start of line or follow non-word text
 
 
 Known Issues
