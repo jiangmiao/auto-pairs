@@ -189,8 +189,13 @@ func! AutoPairsInsert(key)
       let m = s:matchbegin(after, '\v\s*\zs\V'.close)
       if len(m) > 0
         " skip close pair
-        call search(m[1], 'We')
-        return "\<Right>"
+        let c = matchstr(after, '^\V'.close)
+        if c != ""
+          return s:right(c)
+        else
+          call search(m[1], 'We')
+          return "\<Right>"
+        end
       end
     end
   endfor
@@ -425,7 +430,7 @@ func! AutoPairsInit()
     end
     let c = close[0]
     call AutoPairsMap(o)
-    if o != c && mapclose
+    if o != c && c != '' && mapclose
       call AutoPairsMap(c)
     end
     let b:AutoPairsList += [[open, close]]
