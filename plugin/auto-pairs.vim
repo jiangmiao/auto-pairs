@@ -114,11 +114,12 @@ func! s:backspace(s)
   return repeat("\<BS>", s:ulen(a:s))
 endf
 
-func! s:getline(...)
+func! s:getline()
   let line = getline('.')
   let pos = col('.') - 1
   let before = strpart(line, 0, pos)
   let after = strpart(line, pos)
+  let afterline = after
   if a:0 == 0 && g:AutoPairsMultilineClose
     let n = line('$')
     let i = line('.')+1
@@ -131,7 +132,7 @@ func! s:getline(...)
       let i = i+1
     endwhile
   end
-  return [before, after]
+  return [before, after, afterline]
 endf
 
 " split text to two part
@@ -176,7 +177,7 @@ func! AutoPairsInsert(key)
 
   let b:autopairs_saved_pair = [a:key, getpos('.')]
 
-  let [before, after] = s:getline()
+  let [before, after, afterline] = s:getline()
 
   " Ignore auto close if prev character is \
   if before[-1:-1] == '\'
@@ -186,16 +187,20 @@ func! AutoPairsInsert(key)
   " check close pairs
   for [open, close] in b:AutoPairsList
     if a:key == g:AutoPairsWildClosedPair || close[0] == a:key
-      if open == close
-        let [before, after] = s:getline(0)
-      end
-      let m = s:matchbegin(after, '\v\s*\zs\V'.close)
-      if len(m) > 0
-        " skip close pair
-        let c = matchstr(after, '^\V'.close)
-        if c != ""
-          return s:right(c)
+      " the close pair is in the same line
+      let m = matchstr(afterline, '^\v\s*\V'.close)
+      if m != ''
+        if before =~ '\V'.open.'\v\s*$' && m[0] =~ '\v\s'
+          " remove the space we inserted if the text in pairs is blank
+          return "\<DEL>".s:right(m[1:])
         else
+          return s:right(m)
+        end
+      end
+      if open != close
+        let m = s:matchend(after, '^\v\s*\zs\V'.close)
+        if len(m) > 0
+          " skip close pair greedy
           call search(m[1], 'We')
           return "\<Right>"
         end
@@ -265,7 +270,7 @@ func! AutoPairsDelete()
     return "\<BS>"
   end
 
-  let [before, after] = s:getline()
+  let [before, after, ig] = s:getline()
   for [open, close] in b:AutoPairsList
     let b = matchstr(before, '\V'.open.'\v\s?$')
     let a = matchstr(after, '^\v\s*\V'.close)
@@ -288,7 +293,7 @@ endf
 func! AutoPairsFastWrap()
   let c = @"
   normal! x
-  let [before, after] = s:getline()
+  let [before, after, ig] = s:getline()
   if after[0] =~ '\v[\{\[\(\<]'
     normal! %
     normal! p
@@ -301,8 +306,12 @@ func! AutoPairsFastWrap()
         return ""
       end
     endfor
-    normal! e
-    normal! p
+    if after[1:1] =~ '\v[a-zA-Z0-9_]'
+      normal! e
+      normal! p
+    else
+      normal! p
+    end
   end
   let @" = c
   return ""
@@ -367,7 +376,7 @@ func! AutoPairsSpace()
     return "\<SPACE>"
   end
 
-  let [before, after] = s:getline()
+  let [before, after, ig] = s:getline()
 
   for [open, close] in b:AutoPairsList
     if before =~ '\V'.open.'\v$' && after =~ '^\V'.close
