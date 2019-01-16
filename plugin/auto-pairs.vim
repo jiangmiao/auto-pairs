@@ -197,7 +197,7 @@ func! AutoPairsInsert(key)
           return s:right(m)
         end
       end
-      if open != close
+      if a:key == g:AutoPairsWildClosedPair || open != close
         let m = matchstr(after, '^\v\s*\zs\V'.close)
         if m != ''
           " skip close pair greedy
@@ -315,7 +315,7 @@ func! AutoPairsFastWrap()
         return ""
       end
     endfor
-    if after[1:1] =~ '\v[a-zA-Z0-9_]'
+    if after[1:1] =~ '\v\w'
       normal! e
       normal! p
     else
@@ -441,6 +441,9 @@ func! AutoPairsInit()
 
   " buffer level map pairs keys
   for [open, close] in items(b:AutoPairs)
+    if open == close && open == "'"
+      let open = '\v(^|\W)\zs'''
+    end
     let o = open[len(open)-1]
     let m = matchlist(close, '\v(.*)//(.*)$')
     let mapclose = 1
