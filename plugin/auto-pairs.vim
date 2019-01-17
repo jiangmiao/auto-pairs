@@ -211,6 +211,9 @@ func! AutoPairsInsert(key)
   " check open pairs
   let text=before.a:key
   for [open, close] in b:AutoPairsList
+    if open == close && open == "'"
+      let open = '\v(^|\W)\zs'''
+    end
     let m = s:matchend(text, open)
     if len(m) > 0
       " process the open pair
@@ -441,9 +444,6 @@ func! AutoPairsInit()
 
   " buffer level map pairs keys
   for [open, close] in items(b:AutoPairs)
-    if open == close && open == "'"
-      let open = '\v(^|\W)\zs'''
-    end
     let o = open[len(open)-1]
     let m = matchlist(close, '\v(.*)//(.*)$')
     let mapclose = 1
