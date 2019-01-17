@@ -307,7 +307,28 @@ Multibyte Pairs
 
         The text after //  in close pair is modifiers
 
-        n - do not map the first charactor of closed pair
+        n - do not map the first charactor of closed pair to close key
+        s - do not jump through multi line
+
+            pair: "'''":"'''"
+            input:
+                '''
+                |
+                ''' (press ')
+            output:
+                '''
+                 
+                '''|
+
+            pair: "'''":"'''//s"
+            input:
+                '''
+                |
+                ''' (press ')
+            output:
+                '''
+                '|'
+                '''
 
         for 'begin' 'end' pair, e is a charactor, if map e to jump will be annoy, so use modifier 'n' to skip key map
 
@@ -349,7 +370,7 @@ Multibyte Pairs
 
         the 'begin' 'end' pair write in
 
-        au FileType ruby     let b:AutoPairs = AutoPairsDefine({'\v(^|[^\w])\zsbegin': 'end//n'})
+        au FileType ruby     let b:AutoPairs = AutoPairsDefine({'\v(^|\W)\zsbegin': 'end//n'})
 
         will be better, only auto pair when at start of line or follow non-word text
 
