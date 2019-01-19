@@ -159,7 +159,7 @@ endf
 "   add <!-- --> pair and remove '{' for html file
 func! AutoPairsDefine(pairs, ...)
   let r = copy(g:AutoPairs)
-  if a:0 > 1
+  if a:0 > 0
     for open in a:1
       unlet r[open]
     endfor
