@@ -393,6 +393,9 @@ func! AutoPairsSpace()
   let [before, after, ig] = s:getline()
 
   for [open, close, opt] in b:AutoPairsList
+    if close == ''
+      continue
+    end
     if before =~ '\V'.open.'\v$' && after =~ '^\V'.close
       return "\<SPACE>\<SPACE>".s:Left
     end
@@ -444,20 +447,29 @@ func! AutoPairsInit()
   let b:AutoPairsList = []
 
   " buffer level map pairs keys
+  " n - do not map the first charactor of closed pair to close key
+  " m - close key jumps through multi line
+  " s - close key jumps only in the same line
   for [open, close] in items(b:AutoPairs)
-    let o = open[len(open)-1]
-    let m = matchlist(close, '\v(.*)//(.*)$')
+    let o = open[-1:-1]
+    let c = close[0]
     let opt = {'mapclose': 1, 'multiline':1}
+    if o == c
+      let opt['multiline'] = 0
+    end
+    let m = matchlist(close, '\v(.*)//(.*)$')
     if len(m) > 0 
       if m[2] =~ 'n'
         let opt['mapclose'] = 0
+      end
+      if m[2] =~ 'm'
+        let opt['multiline'] = 1
       end
       if m[2] =~ 's'
         let opt['multiline'] = 0
       end
       let close = m[1]
     end
-    let c = close[0]
     call AutoPairsMap(o)
     if o != c && c != '' && opt['mapclose']
       call AutoPairsMap(c)

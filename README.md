@@ -308,27 +308,16 @@ Multibyte Pairs
         The text after //  in close pair is modifiers
 
         n - do not map the first charactor of closed pair to close key
-        s - do not jump through multi line
+        m - close key jumps through multi line
+        s - close key jumps only in the same line
 
-            pair: "'''":"'''"
-            input:
-                '''
-                |
-                ''' (press ')
-            output:
-                '''
-                 
-                '''|
+            by default if open key equals close key the multi line is turn off
 
-            pair: "'''":"'''//s"
-            input:
-                '''
-                |
-                ''' (press ')
-            output:
-                '''
-                '|'
-                '''
+            "<?": "?>"      ? jumps only in the same line
+            "<?": "?>//m"   force ? jumping through multi line
+            "<?php":"?>"    ? will jump through multi line
+            "<?php":"?>//s" force ? only jumping in the same line
+            "<?": "?>//n"   do not jump totally
 
         for 'begin' 'end' pair, e is a charactor, if map e to jump will be annoy, so use modifier 'n' to skip key map
 
