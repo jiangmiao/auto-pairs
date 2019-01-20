@@ -143,6 +143,7 @@ func! s:matchend(text, open)
     end
     return [a:text, strpart(a:text, 0, len(a:text)-len(m)), m]
 endf
+
 func! s:matchbegin(text, close)
     let m = matchstr(a:text, '^\V'.a:close)
     if m == ""
@@ -186,6 +187,9 @@ func! AutoPairsInsert(key)
 
   " check close pairs
   for [open, close, opt] in b:AutoPairsList
+    if close == ''
+      continue
+    end
     if a:key == g:AutoPairsWildClosedPair || opt['mapclose'] && close[0] == a:key
       " the close pair is in the same line
       let m = matchstr(afterline, '^\v\s*\V'.close)
@@ -213,38 +217,38 @@ func! AutoPairsInsert(key)
   " check open pairs
   let text=before.a:key
   for [open, close, opt] in b:AutoPairsList
-    let m = s:matchend(text, open)
-    if len(m) > 0
+    let ms = s:matchend(text, open)
+    if len(ms) > 0
       " process the open pair
       
       " remove inserted pair
       " eg: if the pairs include < > and  <!-- --> 
       " when <!-- is detected the inserted pair < > should be clean up 
       " <?php ?> should backspace 4 times php and <?
-      let target = m[1]
-      let openPair = m[2]
+      let target = ms[1]
+      let openPair = ms[2]
       let text = before
       let i = 0
       while len(text) >= len(target) && target != text 
         let found = 0
         " delete pair
         for [o, c, opt] in b:AutoPairsList
-          let m = s:matchend(text, o)
-          if len(m) > 0
+          let ms = s:matchend(text, o)
+          if len(ms) > 0
             let found = 1
-            let text = m[1]
+            let text = ms[1]
             let i = i + 1
             break
           end
         endfor
         if !found
           " delete charactor
-          let m = s:matchend(text, '\v.')
-          if len(m) == 0
+          let ms = s:matchend(text, '\v.')
+          if len(ms) == 0
             break
           end
           let i = i + 1
-          let text = m[1]
+          let text = ms[1]
         end
       endwhile
       let bs = repeat("\<BS>", i)
@@ -310,6 +314,9 @@ func! AutoPairsFastWrap()
     normal! p
   else
     for [open, close, opt] in b:AutoPairsList
+      if close == ''
+        continue
+      end
       if after =~ '^\s*\V'.open
         call search(close, 'We')
         normal! p
