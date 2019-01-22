@@ -31,7 +31,7 @@ Features
             |
         }          (press } to close the pair)
         output: {
-        }|         (the inserted empty line will be deleted)
+        }|         (the inserted blank line will be deleted)
 
 
 *   Insert spaces before closing characters, only for [], (), {}

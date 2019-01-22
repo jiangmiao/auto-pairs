@@ -194,21 +194,26 @@ func! AutoPairsInsert(key)
     end
     if a:key == g:AutoPairsWildClosedPair || opt['mapclose'] && close[0] == a:key
       " the close pair is in the same line
-      let m = matchstr(after, '^\v\s*\zs\V'.close)
+      let m = matchstr(afterline, '^\v\s*\V'.close)
       if m != ''
-        if b:autopairs_return_pos == line('.') && getline('.') =~ '\v^\s*$'
-          normal! ddk$
-        elseif col('.') > 1
-          normal! h
-        elseif line('.') > 1
-          normal! k$
+        if before =~ '\V'.open.'\v\s*$' && m[0] =~ '\v\s'
+          " remove the space we inserted if the text in pairs is blank
+          return "\<DEL>".s:right(m[1:])
         else
           return s:right(m)
+        end
+      end
+      let m = matchstr(after, '^\v\s*\zs\V'.close)
+      if m != ''
+        if a:key == g:AutoPairsWildClosedPair || opt['multiline']
+          if b:autopairs_return_pos == line('.') && getline('.') =~ '\v^\s*$'
+            normal! ddk$
+          end
+          call search(m, 'We')
+          return "\<Right>"
+        else
           break
         end
-        call search(m, 'We')
-        return "\<Right>"
-        break
       end
     end
   endfor
