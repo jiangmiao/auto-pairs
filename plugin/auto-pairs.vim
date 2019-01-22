@@ -215,9 +215,8 @@ func! AutoPairsInsert(key)
   endfor
 
   " check open pairs
-  let text=before.a:key
   for [open, close, opt] in b:AutoPairsList
-    let ms = s:matchend(text, open)
+    let ms = s:matchend(before.a:key, open)
     if len(ms) > 0
       " process the open pair
       
@@ -227,37 +226,39 @@ func! AutoPairsInsert(key)
       " <?php ?> should backspace 4 times php and <?
       let target = ms[1]
       let openPair = ms[2]
-      let text = before
       let i = 0
-      while len(text) >= len(target) && target != text 
+      let bs = ''
+      let del = ''
+      while len(before) >= len(target) && target != before
         let found = 0
         " delete pair
         for [o, c, opt] in b:AutoPairsList
-          let ms = s:matchend(text, o)
+          let ms = s:matchend(before, o)
           if len(ms) > 0
             let found = 1
-            let text = ms[1]
-            let i = i + 1
+            let before = ms[1]
+            " delete open pair
+            let bs = bs.s:backspace(ms[2])
+            " delete close pair
+            let ms = s:matchbegin(afterline, c)
+            if len(ms) > 0
+              let del = del.s:delete(ms[1])
+              let afterline = ms[2]
+            end
             break
           end
         endfor
         if !found
           " delete charactor
-          let ms = s:matchend(text, '\v.')
+          let ms = s:matchend(before, '\v.')
           if len(ms) == 0
             break
           end
-          let i = i + 1
-          let text = ms[1]
+          let before = ms[1]
+          let bs = bs.s:backspace(ms[2])
         end
       endwhile
-      let bs = repeat("\<BS>", i)
-      if bs != ''
-        call feedkeys(bs)
-      end
-      call feedkeys(openPair.close.s:left(close), "n")
-      return ""
-      " return m.close.s:left(close)
+      return bs.del.openPair.close.s:left(close)
     end
   endfor
 
