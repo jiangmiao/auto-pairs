@@ -120,7 +120,7 @@ func! s:getline()
   let before = strpart(line, 0, pos)
   let after = strpart(line, pos)
   let afterline = after
-  if a:0 == 0 && g:AutoPairsMultilineClose
+  if g:AutoPairsMultilineClose
     let n = line('$')
     let i = line('.')+1
     while i <= n
@@ -136,6 +136,7 @@ func! s:getline()
 endf
 
 " split text to two part
+" returns [orig, text_before_open, open]
 func! s:matchend(text, open)
     let m = matchstr(a:text, '\V'.a:open.'\v$')
     if m == ""
@@ -144,6 +145,7 @@ func! s:matchend(text, open)
     return [a:text, strpart(a:text, 0, len(a:text)-len(m)), m]
 endf
 
+" returns [orig, close, text_after_close]
 func! s:matchbegin(text, close)
     let m = matchstr(a:text, '^\V'.a:close)
     if m == ""
@@ -223,39 +225,36 @@ func! AutoPairsInsert(key)
       " remove inserted pair
       " eg: if the pairs include < > and  <!-- --> 
       " when <!-- is detected the inserted pair < > should be clean up 
-      " <?php ?> should backspace 4 times php and <?
       let target = ms[1]
       let openPair = ms[2]
-      let i = 0
       let bs = ''
       let del = ''
-      while len(before) >= len(target) && target != before
+      while len(before) > len(target) && target != before
         let found = 0
         " delete pair
         for [o, c, opt] in b:AutoPairsList
-          let ms = s:matchend(before, o)
-          if len(ms) > 0
+          let os = s:matchend(before, o)
+          if len(os) && len(os[1]) < len(target)
+            " any text before openPair should not be deleted
+            continue
+          end
+          let cs = s:matchbegin(afterline, c)
+          if len(os) && len(cs)
             let found = 1
-            let before = ms[1]
-            " delete open pair
-            let bs = bs.s:backspace(ms[2])
-            " delete close pair
-            let ms = s:matchbegin(afterline, c)
-            if len(ms) > 0
-              let del = del.s:delete(ms[1])
-              let afterline = ms[2]
-            end
+            let before = os[1]
+            let afterline = cs[2]
+            let bs = bs.s:backspace(os[2])
+            let del = del.s:delete(cs[1])
             break
           end
         endfor
         if !found
           " delete charactor
           let ms = s:matchend(before, '\v.')
-          if len(ms) == 0
-            break
+          if len(ms)
+            let before = ms[1]
+            let bs = bs.s:backspace(ms[2])
           end
-          let before = ms[1]
-          let bs = bs.s:backspace(ms[2])
         end
       endwhile
       return bs.del.openPair.close.s:left(close)
@@ -289,7 +288,7 @@ func! AutoPairsDelete()
           return "\<BS>"
         end
       end
-      return repeat("\<BS>", s:ulen(b)).repeat("\<DELETE>", s:ulen(a))
+      return s:backspace(b).s:delete(a)
     end
   endfor
 
