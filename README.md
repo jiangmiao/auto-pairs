@@ -29,7 +29,10 @@ Features
         input: {|} (press <CR> at |)
         output: {
             |
-        }
+        }          (press } to close the pair)
+        output: {
+        }|         (the inserted empty line will be deleted)
+
 
 *   Insert spaces before closing characters, only for [], (), {}
 
@@ -388,7 +391,7 @@ TroubleShooting
     To fix the issue, you need remap or disable the related shortcut.
 
 Known Issues
------------------------
+------------
 Breaks '.' - [issue #3](https://github.com/jiangmiao/auto-pairs/issues/3)
 
     Description: After entering insert mode and inputing `[hello` then leave insert

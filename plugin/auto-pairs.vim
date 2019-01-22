@@ -194,24 +194,21 @@ func! AutoPairsInsert(key)
     end
     if a:key == g:AutoPairsWildClosedPair || opt['mapclose'] && close[0] == a:key
       " the close pair is in the same line
-      let m = matchstr(afterline, '^\v\s*\V'.close)
-      if m != ''
-        if before =~ '\V'.open.'\v\s*$' && m[0] =~ '\v\s'
-          " remove the space we inserted if the text in pairs is blank
-          return "\<DEL>".s:right(m[1:])
-        else
-          return s:right(m)
-        end
-      end
       let m = matchstr(after, '^\v\s*\zs\V'.close)
       if m != ''
-        if a:key == g:AutoPairsWildClosedPair || opt['multiline']
-          " skip close pair greedy
-          call search(m, 'We')
-          return "\<Right>"
+        if b:autopairs_return_pos == line('.') && getline('.') =~ '\v^\s*$'
+          normal! ddk$
+        elseif col('.') > 1
+          normal! h
+        elseif line('.') > 1
+          normal! k$
         else
+          return s:right(m)
           break
         end
+        call search(m, 'We')
+        return "\<Right>"
+        break
       end
     end
   endfor
@@ -346,28 +343,27 @@ func! AutoPairsMoveCharacter(key)
 endf
 
 func! AutoPairsBackInsert()
-  if exists('b:autopairs_saved_pair')
-    let pair = b:autopairs_saved_pair[0]
-    let pos  = b:autopairs_saved_pair[1]
-    call setpos('.', pos)
-    return pair
-  endif
-  return ''
+  let pair = b:autopairs_saved_pair[0]
+  let pos  = b:autopairs_saved_pair[1]
+  call setpos('.', pos)
+  return pair
 endf
 
 func! AutoPairsReturn()
   if b:autopairs_enabled == 0
     return ''
   end
-  " let before = getline(line('.')-1)
-  let [ig, ig, after] = s:getline()
+  let b:autopairs_return_pos = 0
+  let before = getline(line('.')-1)
+  let [ig, ig, afterline] = s:getline()
   let cmd = ''
   for [open, close, opt] in b:AutoPairsList
     if close == ''
       continue
     end
-    "  before =~ '\V'.open.'\v\s*$' &&
-    if after =~ '^\s*\V'.close
+
+    if before =~ '\V'.open.'\v\s*$' && afterline =~ '^\s*\V'.close
+      let b:autopairs_return_pos = line('.')
       if g:AutoPairsCenterLine && winline() * 3 >= winheight(0) * 2
         " Recenter before adding new line to avoid replacing line content
         let cmd = "zz"
@@ -451,6 +447,8 @@ func! AutoPairsInit()
     let b:AutoPairsMoveCharacter = g:AutoPairsMoveCharacter
   end
 
+  let b:autopairs_return_pos = 0
+  let b:autopairs_saved_pair = [0, 0]
   let b:AutoPairsList = []
 
   " buffer level map pairs keys
