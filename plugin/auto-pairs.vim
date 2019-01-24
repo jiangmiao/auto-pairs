@@ -187,6 +187,51 @@ func! AutoPairsInsert(key)
     return a:key
   end
 
+  " check open pairs
+  for [open, close, opt] in b:AutoPairsList
+    let ms = s:matchend(before.a:key, open)
+    if len(ms) > 0
+      " process the open pair
+      
+      " remove inserted pair
+      " eg: if the pairs include < > and  <!-- --> 
+      " when <!-- is detected the inserted pair < > should be clean up 
+      let target = ms[1]
+      let openPair = ms[2]
+      let bs = ''
+      let del = ''
+      while len(before) > len(target)
+        let found = 0
+        " delete pair
+        for [o, c, opt] in b:AutoPairsList
+          let os = s:matchend(before, o)
+          if len(os) && len(os[1]) < len(target)
+            " any text before openPair should not be deleted
+            continue
+          end
+          let cs = s:matchbegin(afterline, c)
+          if len(os) && len(cs)
+            let found = 1
+            let before = os[1]
+            let afterline = cs[2]
+            let bs = bs.s:backspace(os[2])
+            let del = del.s:delete(cs[1])
+            break
+          end
+        endfor
+        if !found
+          " delete charactor
+          let ms = s:matchend(before, '\v.')
+          if len(ms)
+            let before = ms[1]
+            let bs = bs.s:backspace(ms[2])
+          end
+        end
+      endwhile
+      return bs.del.openPair.close.s:left(close)
+    end
+  endfor
+
   " check close pairs
   for [open, close, opt] in b:AutoPairsList
     if close == ''
@@ -218,50 +263,6 @@ func! AutoPairsInsert(key)
     end
   endfor
 
-  " check open pairs
-  for [open, close, opt] in b:AutoPairsList
-    let ms = s:matchend(before.a:key, open)
-    if len(ms) > 0
-      " process the open pair
-      
-      " remove inserted pair
-      " eg: if the pairs include < > and  <!-- --> 
-      " when <!-- is detected the inserted pair < > should be clean up 
-      let target = ms[1]
-      let openPair = ms[2]
-      let bs = ''
-      let del = ''
-      while len(before) > len(target) && target != before
-        let found = 0
-        " delete pair
-        for [o, c, opt] in b:AutoPairsList
-          let os = s:matchend(before, o)
-          if len(os) && len(os[1]) < len(target)
-            " any text before openPair should not be deleted
-            continue
-          end
-          let cs = s:matchbegin(afterline, c)
-          if len(os) && len(cs)
-            let found = 1
-            let before = os[1]
-            let afterline = cs[2]
-            let bs = bs.s:backspace(os[2])
-            let del = del.s:delete(cs[1])
-            break
-          end
-        endfor
-        if !found
-          " delete charactor
-          let ms = s:matchend(before, '\v.')
-          if len(ms)
-            let before = ms[1]
-            let bs = bs.s:backspace(ms[2])
-          end
-        end
-      endwhile
-      return bs.del.openPair.close.s:left(close)
-    end
-  endfor
 
   " Fly Mode, and the key is closed-pairs, search closed-pair and jump
   if g:AutoPairsFlyMode &&  a:key =~ '\v[\}\]\)]'
