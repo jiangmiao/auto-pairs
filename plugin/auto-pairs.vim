@@ -190,7 +190,7 @@ func! AutoPairsInsert(key)
   " check open pairs
   for [open, close, opt] in b:AutoPairsList
     let ms = s:matchend(before.a:key, open)
-    let m = matchstr(afterline, '^\v\s*\V'.close)
+    let m = matchstr(afterline, '^\v\s*\zs\V'.close)
     if len(ms) > 0
       " process the open pair
       
