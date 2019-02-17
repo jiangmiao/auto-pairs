@@ -285,6 +285,13 @@ Options
         for pair {'begin': 'end//n]'}, e is not mapped, use wild closed pair ] to jump over 'end'
         use <M-b> to back insert ] after jumping
 
+*   g:AutoPairsEqualPairDetection
+
+        Default: 1
+
+        Detects when to close a pair by detecting the equality of pairs within
+        the current buffer. (This feature is not supported for multibyte pairs)
+
 Buffer Level Pairs Setting
 --------------------------
 
