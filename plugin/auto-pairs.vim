@@ -342,6 +342,11 @@ func! AutoPairsDelete()
           return "\<BS>"
         end
       end
+      if strlen(open) == 1 && g:AutoPairsEqualPairDetection == 1
+        if s:count(open) !=# s:count(close)
+          return s:backspace(b)
+        endif
+      endif
       return s:backspace(b).s:delete(a)
     end
   endfor

@@ -100,6 +100,16 @@ Features
         ---
 
         input:
+            ((|)
+
+        (press <BS> at |)
+
+        output:
+            (|)
+
+        ---
+
+        input:
             |]]
 
         (press [ at |)
