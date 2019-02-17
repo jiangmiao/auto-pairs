@@ -291,9 +291,8 @@ Jump to the next closed pair.
 
 Default: 1
 
-Detects when to close a pair and how to delete an existing pair by detecting the
-equality of pairs within the current buffer. (This feature is not supported for
-multibyte pairs)
+Detects when to close/delete pairs by detecting the equality of pairs within the
+current buffer. (This feature is not supported for multibyte pairs)
 
 
                                                 *g:AutoPairsShortcutBackInsert*
