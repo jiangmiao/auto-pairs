@@ -16,6 +16,28 @@ if !exists('g:AutoPairs')
   let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '```':'```', '"""':'"""', "'''":"'''", "`":"`"}
 end
 
+" default pairs base on filetype
+func! AutoPairsDefaultPairs()
+  if exists('b:autopairs_defaultpairs')
+    return b:autopairs_defaultpairs
+  end
+  let r = copy(g:AutoPairs)
+  let allPairs = {
+        \ 'vim': {'\v^\s*\zs"': ''},
+        \ 'rust': {'\w\zs<': '>', '&\zs''': ''},
+        \ 'php': {'<?': '?>//n', '<?php': '?>//n'}
+        \ }
+  for [filetype, pairs] in items(allPairs)
+    if &filetype == filetype
+      for [open, close] in items(pairs)
+        let r[open] = close
+      endfor
+    end
+  endfor
+  let b:autopairs_defaultpairs = r
+  return r
+endf
+
 if !exists('g:AutoPairsMapBS')
   let g:AutoPairsMapBS = 1
 end
@@ -161,7 +183,7 @@ endf
 "   au FileType html let b:AutoPairs = AutoPairsDefine({'<!--' : '-->'}, ['{'])
 "   add <!-- --> pair and remove '{' for html file
 func! AutoPairsDefine(pairs, ...)
-  let r = copy(g:AutoPairs)
+  let r = AutoPairsDefaultPairs()
   if a:0 > 0
     for open in a:1
       unlet r[open]
@@ -453,9 +475,8 @@ func! AutoPairsInit()
   end
 
   if !exists('b:AutoPairs')
-    let b:AutoPairs = g:AutoPairs
+    let b:AutoPairs = AutoPairsDefaultPairs()
   end
-
 
   if !exists('b:AutoPairsMoveCharacter')
     let b:AutoPairsMoveCharacter = g:AutoPairsMoveCharacter
