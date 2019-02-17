@@ -87,7 +87,7 @@ Features
 
         }|
 
-*   Auto detect when to close by checking the equality of pairs within the buffer: >
+*   Auto detect when to close by checking the equality of pairs within the buffer
 
         input:
             const user = getUser|id)
@@ -146,7 +146,7 @@ Features
         See Fly Mode section for details
 
 *  Multibyte Pairs
-        
+
         Support any multibyte pairs such as <!-- -->, <% %>, """ """
         See multibyte pairs section for details
 
