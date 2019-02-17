@@ -115,6 +115,16 @@ Auto detect when to close by checking the equality of pairs within the buffer: >
         ---
 
         input:
+            ((|)
+
+        (press <BS> at |)
+
+        output:
+            (|)
+
+        ---
+
+        input:
             |]]
 
         (press [ at |)
