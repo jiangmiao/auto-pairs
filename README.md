@@ -87,6 +87,35 @@ Features
 
         }|
 
+*   Auto detect when to close by checking the equality of pairs within the buffer: >
+
+        input:
+            const user = getUser|id)
+
+        (press ( at |)
+
+        output:
+            const user = getUser(id)
+
+        ---
+
+        input:
+            |]]
+
+        (press [ at |)
+
+        output:
+            [|]]
+
+        (press [ at | again)
+
+        output:
+            [[|]]
+
+        (press [ at | again)
+
+        output:
+            [[[|]]]
 *  Fly Mode
 
         input: if(a[3)

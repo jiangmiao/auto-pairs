@@ -103,6 +103,35 @@ Support ```, ''' and """: >
         output:
             '''|'''
 
+Auto detect when to close by checking the equality of pairs within the buffer: >
+        input:
+            const user = getUser|id)
+
+        (press ( at |)
+
+        output:
+            const user = getUser(id)
+
+        ---
+
+        input:
+            |]]
+
+        (press [ at |)
+
+        output:
+            [|]]
+
+        (press [ at | again)
+
+        output:
+            [[|]]
+
+        (press [ at | again)
+
+        output:
+            [[[|]]]
+
 Delete Repeated Pairs in one time: >
 
         input: """|""" (press <BS> at |)
@@ -245,6 +274,15 @@ Fast wrap the word. All pairs will be considered as a block (including <>).
 Default: <M-n>
 
 Jump to the next closed pair.
+
+
+                                                *g:AutoPairsEqualPairDetection*
+|g:AutoPairsEqualPairDetection|                                             int
+
+Default: 1
+
+Detects when to close a pair by detecting the equality of pairs within the
+current buffer. (This feature is not supported for multibyte pairs)
 
 
                                                 *g:AutoPairsShortcutBackInsert*

@@ -79,6 +79,10 @@ if !exists('g:AutoPairsShortcutJump')
   let g:AutoPairsShortcutJump = '<M-n>'
 endif
 
+if !exists('g:AutoPairsEqualPairDetection')
+  let g:AutoPairsEqualPairDetection = 1
+endif
+
 " Fly mode will for closed pair to jump to closed pair instead of insert.
 " also support AutoPairsBackInsert to insert pairs where jumped.
 if !exists('g:AutoPairsFlyMode')
@@ -195,6 +199,20 @@ func! AutoPairsDefine(pairs, ...)
   return r
 endf
 
+func! s:count(word)
+  " Because of the substitution the cursor is moved when there are matches and
+  " thus we have to preserve the cursor position.
+  let cpos = [line('.'), col('.')]
+  try
+    let result = execute('%s/\V' . a:word . '//gn')
+    call cursor(cpos)
+    let occurences = trim(strpart(result, 0, stridx(result, " ")))
+    return occurences
+  catch
+    return 0
+  endtry
+endfunction
+
 func! AutoPairsInsert(key)
   if !b:autopairs_enabled
     return a:key
@@ -246,7 +264,7 @@ func! AutoPairsInsert(key)
           end
         endfor
         if !found
-          " delete charactor
+          " delete character
           let ms = s:matchend(before, '\v.')
           if len(ms)
             let before = ms[1]
@@ -254,7 +272,14 @@ func! AutoPairsInsert(key)
           end
         end
       endwhile
-      return bs.del.openPair.close.s:left(close)
+
+      if strlen(open) == 1 && g:AutoPairsEqualPairDetection == 1
+        if s:count(open) == s:count(close)
+          return bs.del.openPair.close.s:left(close)
+        endif
+      else
+        return bs.del.openPair.close.s:left(close)
+      endif
     end
   endfor
 
