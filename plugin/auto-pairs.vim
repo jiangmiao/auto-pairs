@@ -1,11 +1,11 @@
 " Insert or delete brackets, parens, quotes in pairs.
-" Maintainer:	JiangMiao <jiangfriend@gmail.com>
-" Contributor: camthompson
+" Maintainer:   JiangMiao <jiangfriend@gmail.com>
+" Contributors: camthompson, kkoomen
 " Last Change:  2019-02-02
-" Version: 2.0.0
-" Homepage: http://www.vim.org/scripts/script.php?script_id=3599
-" Repository: https://github.com/jiangmiao/auto-pairs
-" License: MIT
+" Version:      2.0.0
+" Homepage:     http://www.vim.org/scripts/script.php?script_id=3599
+" Repository:   https://github.com/jiangmiao/auto-pairs
+" License:      MIT
 
 if exists('g:AutoPairsLoaded') || &cp
   finish

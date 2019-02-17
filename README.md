@@ -439,6 +439,7 @@ Breaks '.' - [issue #3](https://github.com/jiangmiao/auto-pairs/issues/3)
 Contributors
 ------------
 * [camthompson](https://github.com/camthompson)
+* [kkoomen](https://github.com/kkoomen)
 
 
 License
