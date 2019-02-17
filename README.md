@@ -87,7 +87,7 @@ Features
 
         }|
 
-*   Auto detect when to close by checking the equality of pairs within the buffer
+*   Auto detect how to close/delete pairs by checking the equality of pairs
 
         input:
             const user = getUser|id)
