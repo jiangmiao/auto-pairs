@@ -596,6 +596,7 @@ endf
 func! s:ExpandMap(map)
   let map = a:map
   let map = substitute(map, '\(<Plug>\w\+\)', '\=maparg(submatch(1), "i")', 'g')
+  let map = substitute(map, '\(<Plug>([^)]*)\)', '\=maparg(submatch(1), "i")', 'g')
   return map
 endf
 
