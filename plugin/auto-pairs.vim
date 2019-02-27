@@ -25,7 +25,7 @@ func! AutoPairsDefaultPairs()
   let allPairs = {
         \ 'vim': {'\v^\s*\zs"': ''},
         \ 'rust': {'\w\zs<': '>', '&\zs''': ''},
-        \ 'php': {'<?': '?>//n', '<?php': '?>//n'}
+        \ 'php': {'<?': '?>//k]', '<?php': '?>//k]'}
         \ }
   for [filetype, pairs] in items(allPairs)
     if &filetype == filetype
@@ -52,7 +52,7 @@ if !exists('g:AutoPairsMapCR')
 end
 
 if !exists('g:AutoPairsWildClosedPair')
-  let g:AutoPairsWildClosedPair = ']'
+  let g:AutoPairsWildClosedPair = ''
 end
 
 if !exists('g:AutoPairsMapSpace')
@@ -263,7 +263,7 @@ func! AutoPairsInsert(key)
     if close == ''
       continue
     end
-    if a:key == g:AutoPairsWildClosedPair || opt['mapclose'] && close[0] == a:key
+    if a:key == g:AutoPairsWildClosedPair || opt['mapclose'] && opt['key'] == a:key
       " the close pair is in the same line
       let m = matchstr(afterline, '^\v\s*\V'.close)
       if m != ''
@@ -494,6 +494,7 @@ func! AutoPairsInit()
     let o = open[-1:-1]
     let c = close[0]
     let opt = {'mapclose': 1, 'multiline':1}
+    let opt['key'] = c
     if o == c
       let opt['multiline'] = 0
     end
@@ -507,6 +508,11 @@ func! AutoPairsInit()
       end
       if m[2] =~ 's'
         let opt['multiline'] = 0
+      end
+      let ks = matchlist(m[2], '\vk(.)')
+      if len(ks) > 0
+        let opt['key'] = ks[1]
+        let c = opt['key']
       end
       let close = m[1]
     end

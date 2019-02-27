@@ -248,14 +248,6 @@ Options
         Map <M-(> <M-)> <M-[> <M-]> <M-{> <M-}> <M-"> <M-'> to
         move character under the cursor to the pair.
 
-*   g:AutoPairsWildClosedPair
-
-        Default: ']'
-
-        Jump over following closed pair
-        for pair {'begin': 'end//n]'}, e is not mapped, use wild closed pair ] to jump over 'end'
-        use <M-b> to back insert ] after jumping
-
 Buffer Level Pairs Setting
 --------------------------
 
@@ -313,6 +305,7 @@ Multibyte Pairs
         n - do not map the first charactor of closed pair to close key
         m - close key jumps through multi line
         s - close key jumps only in the same line
+        k[KEY] - map the close key to [KEY]
 
             by default if open key equals close key the multi line is turn off
 
@@ -321,6 +314,7 @@ Multibyte Pairs
             "<?php":"?>"    ? will jump through multi line
             "<?php":"?>//s" force ? only jumping in the same line
             "<?": "?>//n"   do not jump totally
+            "<?": "?>//k]"  use key ] to jump through ?>
 
         for 'begin' 'end' pair, e is a charactor, if map e to jump will be annoy, so use modifier 'n' to skip key map
 
