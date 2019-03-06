@@ -16,6 +16,13 @@ if !exists('g:AutoPairs')
   let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '```':'```', '"""':'"""', "'''":"'''", "`":"`"}
 end
 
+" Extend default dictionary with extra pair dictionary
+" This feature is useful when user doesn't want to disturb the pristine AutoPairs
+" dictionary.
+if exists('g:ExtraAutoPairs')
+  call extend(g:AutoPairs, g:ExtraAutoPairs)
+end
+
 " default pairs base on filetype
 func! AutoPairsDefaultPairs()
   if exists('b:autopairs_defaultpairs')

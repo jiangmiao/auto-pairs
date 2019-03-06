@@ -161,6 +161,11 @@ Options
 
         Default: {'(':')', '[':']', '{':'}',"'":"'",'"':'"', "`":"`", '```':'```', '"""':'"""', "'''":"'''"}
 
+*   g:ExtraAutoPairs
+
+        Append to pristine dictionary of pairs rather than overwriting the it.
+        let g:ExtraAutoPairs = {'<':'>'}
+
 *   b:AutoPairs
 
         Default: g:AutoPairs
