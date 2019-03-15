@@ -9,7 +9,7 @@ CONTENTS                                                    *autopairs-contents*
 
     1. Installation ............................. |autopairs-installation|
     2. Features ..................................... |autopairs-features|
-    3. Fly Mode ..................................... |autopairs-fly-mode|
+    3. Fly Mode ...................................... |autopairs-flymode|
     4. Shortcuts ................................... |autopairs-shortcuts|
     5. Options ....................................... |autopairs-options|
     6. Troubleshooting ......................  |autopairs-troubleshooting|
