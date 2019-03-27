@@ -63,6 +63,14 @@ if !exists('g:AutoPairsCenterLine')
   let g:AutoPairsCenterLine = 1
 end
 
+if !exists('g:AutoPairsFormat')
+  let g:AutoPairsFormat = 1
+end
+
+if !exists('g:AutoPairsIndent')
+  let g:AutoPairsIndent = 0
+end
+
 if !exists('g:AutoPairsShortcutToggle')
   let g:AutoPairsShortcutToggle = '<M-p>'
 end
@@ -389,6 +397,8 @@ func! AutoPairsReturn()
   let before = getline(line('.')-1)
   let [ig, ig, afterline] = s:getline()
   let cmd = ''
+  let format = ''
+  let indent = ''
   for [open, close, opt] in b:AutoPairsList
     if close == ''
       continue
@@ -407,13 +417,23 @@ func! AutoPairsReturn()
         return "\<ESC>".cmd."O"
       endif
 
+      if g:AutoPairsFormat == 1
+        " Use vim to to automatically format content
+        let format = "="
+      end
+
+      if g:AutoPairsIndent == 1
+        " Indent new line when using <CR> between pairs
+        let indent = "\t"
+      end
+
       " conflict with javascript and coffee
       " javascript   need   indent new line
       " coffeescript forbid indent new line
       if &filetype == 'coffeescript' || &filetype == 'coffee'
-        return "\<ESC>".cmd."k==o"
+        return "\<ESC>".cmd."k".format.format."o"
       else
-        return "\<ESC>".cmd."=ko"
+        return "\<ESC>".cmd.format."ko".indent
       endif
     end
   endfor
