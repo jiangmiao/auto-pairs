@@ -365,7 +365,7 @@ func! AutoPairsFastWrap()
 endf
 
 func! AutoPairsJump()
-  call search('["\]'')}]','W')
+  call search('[' . escape(join(values(b:AutoPairs), ''), "']") . ']', 'W')
 endf
 
 func! AutoPairsMoveCharacter(key)
