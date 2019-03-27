@@ -248,6 +248,18 @@ Options
         Map <M-(> <M-)> <M-[> <M-]> <M-{> <M-}> <M-"> <M-'> to
         move character under the cursor to the pair.
 
+*   g:AutoPairsFormat
+
+        Default: 1
+
+        Use vim to automatically format code upon <CR>.
+
+*   g:AutoPairsIndent
+
+        Default: 0
+
+        Automatically indent cursor upon <CR>.
+
 Buffer Level Pairs Setting
 --------------------------
 
