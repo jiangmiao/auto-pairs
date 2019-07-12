@@ -11,6 +11,8 @@ Installation
   * `git clone git://github.com/jiangmiao/auto-pairs.git ~/.vim/bundle/auto-pairs`
 * [Vundle](https://github.com/VundleVim/Vundle.vim)
   * `Plugin 'jiangmiao/auto-pairs'`
+* [Vim-Plug](https://github.com/junegunn/vim-plug)
+  * `Plug 'jiangmiao/auto-pairs'`
 
 Features
 --------
