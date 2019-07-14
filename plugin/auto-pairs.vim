@@ -334,7 +334,7 @@ endf
 
 
 " Fast wrap the word in brackets
-func! AutoPairsFastWrap()
+func! AutoPairsFastWrap(movement)
   let c = @"
   normal! x
   let [before, after, ig] = s:getline()
@@ -354,7 +354,7 @@ func! AutoPairsFastWrap()
       end
     endfor
     if after[1:1] =~ '\v\w'
-      normal! e
+      execute "normal! ".a:movement
       normal! p
     else
       normal! p
@@ -559,7 +559,7 @@ func! AutoPairsInit()
   end
 
   if g:AutoPairsShortcutFastWrap != ''
-    execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap()<CR>'
+    execute 'inoremap <buffer> <silent> '.g:AutoPairsShortcutFastWrap.' <C-R>=AutoPairsFastWrap("e")<CR>'
   end
 
   if g:AutoPairsShortcutBackInsert != ''
