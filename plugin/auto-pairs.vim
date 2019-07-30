@@ -208,8 +208,8 @@ func! AutoPairsInsert(key)
 
   let [before, after, afterline] = s:getline()
 
-  " Ignore auto close if prev character is \
-  if before[-1:-1] == '\'
+  " Ignore auto close if prev character is in g:AutoPairsIgnoreCharacters
+  if index(g:AutoPairsIgnoreCharacters, prev_char) != -1
     return a:key
   end
 
