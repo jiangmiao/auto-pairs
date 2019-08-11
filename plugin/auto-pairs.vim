@@ -100,6 +100,10 @@ if !exists('g:AutoPairsSmartQuotes')
   let g:AutoPairsSmartQuotes = 1
 endif
 
+if !exists('g:AutoPairsIgnoreCharacters')
+  let g:AutoPairsIgnoreCharacters = ['\']
+endif
+
 " 7.4.849 support <C-G>U to avoid breaking '.'
 " Issue talk: https://github.com/jiangmiao/auto-pairs/issues/3
 " Vim note: https://github.com/vim/vim/releases/tag/v7.4.849
@@ -204,8 +208,8 @@ func! AutoPairsInsert(key)
 
   let [before, after, afterline] = s:getline()
 
-  " Ignore auto close if prev character is \
-  if before[-1:-1] == '\'
+  " Ignore auto close if prev character is in g:AutoPairsIgnoreCharacters
+  if index(g:AutoPairsIgnoreCharacters, prev_char) != -1
     return a:key
   end
 
@@ -331,7 +335,6 @@ func! AutoPairsDelete()
   endfor
   return "\<BS>"
 endf
-
 
 " Fast wrap the word in brackets
 func! AutoPairsFastWrap()

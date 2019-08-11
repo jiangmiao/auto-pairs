@@ -241,6 +241,13 @@ Options
 
         Work with FlyMode, insert the key at the Fly Mode jumped postion
 
+*   g:AutoPairsIgnoreCharacters
+
+        Default : ['\']
+
+        Sets the characters to stop auto closing. For example, when set to
+        ['\', '#'], the plugin will not automatically close `#'`
+
 *   g:AutoPairsMoveCharacter
 
         Default: "()[]{}\"'"
