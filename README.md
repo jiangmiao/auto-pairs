@@ -1,3 +1,5 @@
+# NOTE: this fork fixes this unexpected indentation problem: https://github.com/jiangmiao/auto-pairs/issues/215 and does nothing else
+
 Auto Pairs
 ==========
 Insert or delete brackets, parens, quotes in pair.
