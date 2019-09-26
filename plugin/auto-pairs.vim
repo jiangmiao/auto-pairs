@@ -413,7 +413,7 @@ func! AutoPairsReturn()
       if &filetype == 'coffeescript' || &filetype == 'coffee'
         return "\<ESC>".cmd."k==o"
       else
-        return "\<ESC>".cmd."=ko\t"
+        return "\<ESC>".cmd."ko\t"
       endif
     end
   endfor
