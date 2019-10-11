@@ -312,6 +312,17 @@ func! AutoPairsDelete()
   for [open, close, opt] in b:AutoPairsList
     let b = matchstr(before, '\V'.open.'\v\s?$')
     let a = matchstr(after, '^\v\s*\V'.close)
+    echom 'getline yielded:'
+        echom "\tbefore:\t'" . before . "',"
+        echom "\tafter:\t'" . after . "',"
+        echom "\tig:\t'" . ig . "'"
+    echom 'pairs:'
+        echom "\topen:\t'" . open . "',"
+        echom "\tclose:\t'". close . "',"
+        echom "\topt:\t'" . string(opt) . "'"
+    echom 'results:'
+        echom "\tb:\t'" . b . "',"
+        echom "\ta:\t'" . a . "'"
     if b != '' && a != ''
       if b[-1:-1] == ' '
         if a[0] == ' '
