@@ -310,19 +310,21 @@ func! AutoPairsDelete()
 
   let [before, after, ig] = s:getline()
   for [open, close, opt] in b:AutoPairsList
+    let rest_of_line = opt['multiline'] ? after : ig
     let b = matchstr(before, '\V'.open.'\v\s?$')
-    let a = matchstr(after, '^\v\s*\V'.close)
+    let a = matchstr(rest_of_line, '^\v\s*\V'.close)
     echom 'getline yielded:'
-        echom "\tbefore:\t'" . before . "',"
-        echom "\tafter:\t'" . after . "',"
-        echom "\tig:\t'" . ig . "'"
+        echom "  before:       '" . before . "',"
+        echom "  after:        '" . after . "',"
+        echom "  ig:           '" . ig . "',"
+        echom "  rest_of_line: '" . after . "'" | echom ""
     echom 'pairs:'
-        echom "\topen:\t'" . open . "',"
-        echom "\tclose:\t'". close . "',"
-        echom "\topt:\t'" . string(opt) . "'"
+        echom "  open:  '" . open . "',"
+        echom "  close: '" . close . "',"
+        echom "  opt:   '" . string(opt) . "'" | echom ""
     echom 'results:'
-        echom "\tb:\t'" . b . "',"
-        echom "\ta:\t'" . a . "'"
+        echom "  b: '" . b . "',"
+        echom "  a: '" . a . "'"
     if b != '' && a != ''
       if b[-1:-1] == ' '
         if a[0] == ' '
