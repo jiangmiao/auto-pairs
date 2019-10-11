@@ -21,9 +21,12 @@ func! AutoPairsDefaultPairs()
   if exists('b:autopairs_defaultpairs')
     return b:autopairs_defaultpairs
   end
+  " Added a more complex regex to capture in-line VimL comments
+  let no_quotes = '(\\\"|[^"])*'
+  let com_inl = '|^("'.no_quotes.'"*|[^"])* \zs"\ze'.no_quotes.'$'
   let r = copy(g:AutoPairs)
   let allPairs = {
-        \ 'vim': {'\v^\s*\zs"': ''},
+        \ 'vim': {'\v^\s*\zs"'.com_inl: ''},
         \ 'rust': {'\w\zs<': '>', '&\zs''': ''},
         \ 'php': {'<?': '?>//k]', '<?php': '?>//k]'}
         \ }
