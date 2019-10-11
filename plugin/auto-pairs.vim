@@ -313,18 +313,6 @@ func! AutoPairsDelete()
     let rest_of_line = opt['multiline'] ? after : ig
     let b = matchstr(before, '\V'.open.'\v\s?$')
     let a = matchstr(rest_of_line, '^\v\s*\V'.close)
-    echom 'getline yielded:'
-        echom "  before:       '" . before . "',"
-        echom "  after:        '" . after . "',"
-        echom "  ig:           '" . ig . "',"
-        echom "  rest_of_line: '" . after . "'" | echom ""
-    echom 'pairs:'
-        echom "  open:  '" . open . "',"
-        echom "  close: '" . close . "',"
-        echom "  opt:   '" . string(opt) . "'" | echom ""
-    echom 'results:'
-        echom "  b: '" . b . "',"
-        echom "  a: '" . a . "'"
     if b != '' && a != ''
       if b[-1:-1] == ' '
         if a[0] == ' '
@@ -511,7 +499,7 @@ func! AutoPairsInit()
     let c = close[0]
     let opt = {'mapclose': 1, 'multiline':1}
     let opt['key'] = c
-    if o == c
+    if o == c || len(c) == 0
       let opt['multiline'] = 0
     end
     let m = matchlist(close, '\v(.*)//(.*)$')
