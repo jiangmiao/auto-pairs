@@ -212,20 +212,11 @@ func! AutoPairsInsert(key)
     return a:key
   end
 
-  echom "gline: ".string(s:getline())
   " check open pairs
   for [open, close, opt] in b:AutoPairsList
     let ms = s:matchend(before.a:key, open)
     let m = matchstr(afterline, '^\v\s*\zs\V'.close)
-    echom "beg?:  ".string(matchstr(before.a:key, '\V'.open.'\v$'))
-    echom "pair:  ".string([open, close, opt])
-    echom "ms:    ".string(ms)
-    echom "m:     ".string(m)
-    echom "key:   ".string(a:key)
-    " If the pair has no corresponding closing string, why bother
-    if close == ''
-        break
-    elseif len(ms) > 0
+    if len(ms) > 0
       " process the open pair
       
       " remove inserted pair
@@ -233,7 +224,7 @@ func! AutoPairsInsert(key)
       " when <!-- is detected the inserted pair < > should be clean up 
       let target = ms[1]
       let openPair = ms[2]
-      if (len(openPair) == 1 && m == openPair)
+      if (len(openPair) == 1 && m == openPair) || (close == '')
         break
       end
       let bs = ''
