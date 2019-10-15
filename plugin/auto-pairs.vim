@@ -338,7 +338,7 @@ func! AutoPairsFastWrap()
   let c = @"
   normal! x
   let [before, after, ig] = s:getline()
-  if after[0] =~ '\v[\{\[\(\<]'
+  if after[0] =~ '\v[{[(<]'
     normal! %
     normal! p
   else
