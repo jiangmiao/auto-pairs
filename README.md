@@ -129,13 +129,13 @@ If jumps in mistake, could use AutoPairsBackInsert(Default Key: `<M-b>`) to jump
 
 the most situation maybe want to insert single closed pair in the string, eg ")"
 
-Fly Mode is DISABLED by default.
+Fly Mode is ENABLED by default.
 
-add **let g:AutoPairsFlyMode = 1** .vimrc to turn it on
+add **let g:AutoPairsFlyMode = 0** .vimrc to turn it off
 
 Default Options:
 
-    let g:AutoPairsFlyMode = 0
+    let g:AutoPairsFlyMode = 1
     let g:AutoPairsShortcutBackInsert = '<M-b>'
 
 Shortcuts
