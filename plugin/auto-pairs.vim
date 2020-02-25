@@ -491,8 +491,8 @@ func! AutoPairsInit()
   " m - close key jumps through multi line
   " s - close key jumps only in the same line
   for [open, close] in items(b:AutoPairs)
-    let o = open[-1:-1]
-    let c = close[0]
+    let o = open
+    let c = close
     let opt = {'mapclose': 1, 'multiline':1}
     let opt['key'] = c
     if o == c
