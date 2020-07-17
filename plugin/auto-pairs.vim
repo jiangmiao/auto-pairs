@@ -186,7 +186,9 @@ func! AutoPairsDefine(pairs, ...)
   let r = AutoPairsDefaultPairs()
   if a:0 > 0
     for open in a:1
-      unlet r[open]
+      if has_key(r, open)
+        unlet r[open]
+      end
     endfor
   end
   for [open, close] in items(a:pairs)
