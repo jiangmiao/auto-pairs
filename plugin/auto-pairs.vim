@@ -412,6 +412,9 @@ func! AutoPairsReturn()
       " coffeescript forbid indent new line
       if &filetype == 'coffeescript' || &filetype == 'coffee'
         return "\<ESC>".cmd."k==o"
+      endif
+      if &filetype == 'python'
+        return "\<BS>\<BS>\<ESC>".cmd."O\<BS>"
       else
         return "\<ESC>".cmd."=ko"
       endif
