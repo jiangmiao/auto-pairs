@@ -14,6 +14,9 @@ Installation
 
 Features
 --------
+
+`|` represents the cursor.
+
 *   Insert in pair
 
         input: [
