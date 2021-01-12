@@ -7,6 +7,9 @@ Installation
 
 * Manual
   * Copy `plugin/auto-pairs.vim` to `~/.vim/plugin`
+* Vim8 packages  
+  * `mkdir -p ~/.vim/pack/plugins/start/`
+  * `git clone --depth 1  https://github.com/jiangmiao/auto-pairs.git ~/.vim/pack/plugins/start/auto-pairs`
 * [Pathogen](https://github.com/tpope/vim-pathogen)
   * `git clone git://github.com/jiangmiao/auto-pairs.git ~/.vim/bundle/auto-pairs`
 * [Vundle](https://github.com/VundleVim/Vundle.vim)
