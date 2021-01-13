@@ -129,6 +129,9 @@ If jumps in mistake, could use AutoPairsBackInsert(Default Key: `<M-b>`) to jump
 
 the most situation maybe want to insert single closed pair in the string, eg ")"
 
+If you want to use Fly Mode only for some brackets, e. g. for "}" and "]", but not for ")",
+set **let g:AutoPairsFlyBrackets** to a regex that matches the desired pairs, e. g. '\v[\}\]]'
+
 Fly Mode is DISABLED by default.
 
 add **let g:AutoPairsFlyMode = 1** .vimrc to turn it on
@@ -137,6 +140,7 @@ Default Options:
 
     let g:AutoPairsFlyMode = 0
     let g:AutoPairsShortcutBackInsert = '<M-b>'
+    let g:AutoPairsFlyBrackets = '\v[\}\]\)]'
 
 Shortcuts
 ---------
