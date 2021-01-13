@@ -159,11 +159,16 @@ Fly Mode is DISABLED by default. To enable Fly Mode add following to your
 '.vimrc': >
 
     let g:AutoPairsFlyMode = 1
+    
+The brackets that will trigger Fly Mode can be set using
+
+    let g:AutoPairsFlyBrackets = '\v[\}\]]'
 
 Default Options: >
 
     let g:AutoPairsFlyMode = 0
     let g:AutoPairsShortcutBackInsert = '<M-b>'
+    let g:AutoPairsFlyBrackets = '\v[\}\]\)]'
 
 ==============================================================================
 4. Shortcuts                                             *autopairs-shortcuts*
@@ -313,6 +318,16 @@ Executes:
 Default: 0
 
 Set it to 1 to enable |autopairs-flymode|.
+
+
+                                                       *g:AutoPairsFlyBrackets*
+|g:AutoPairsFlyBrackets|                                                 string
+
+Default: '\v[\}\]\)]'
+
+Set it to a RegExp that should match Brackets which will trigger Fly Mode.
+By setting it to '\v[\}\]]' for example, only "}" and ")" will make the cursor
+jump to the closing bracket, and ) inserts a ).
 
 
                                                     *g:AutoPairsMultilineClose*
