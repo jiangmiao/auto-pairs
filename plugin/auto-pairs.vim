@@ -85,6 +85,12 @@ if !exists('g:AutoPairsFlyMode')
   let g:AutoPairsFlyMode = 0
 endif
 
+" Which closing brackets should trigger fly mode.
+" AutoPairsFlyBrackets is a regex of brackets to fly on
+if !exists('g:AutoPairsFlyBrackets')
+  let g:AutoPairsFlyBrackets = '\v[\}\]\)]'
+endif
+
 " When skipping the closed pair, look at the current and
 " next line as well.
 if !exists('g:AutoPairsMultilineClose')
@@ -291,7 +297,7 @@ func! AutoPairsInsert(key)
 
 
   " Fly Mode, and the key is closed-pairs, search closed-pair and jump
-  if g:AutoPairsFlyMode &&  a:key =~ '\v[\}\]\)]'
+  if g:AutoPairsFlyMode &&  a:key =~ g:AutoPairsFlyBrackets
     if search(a:key, 'We')
       return "\<Right>"
     endif
