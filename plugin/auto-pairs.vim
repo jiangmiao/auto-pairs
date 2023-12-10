@@ -25,7 +25,8 @@ func! AutoPairsDefaultPairs()
   let allPairs = {
         \ 'vim': {'\v^\s*\zs"': ''},
         \ 'rust': {'\w\zs<': '>', '&\zs''': ''},
-        \ 'php': {'<?': '?>//k]', '<?php': '?>//k]'}
+        \ 'php': {'<?': '?>//k]', '<?php': '?>//k]'},
+        \ 'markdown': {'$': '$', '$$': '$$'}
         \ }
   for [filetype, pairs] in items(allPairs)
     if &filetype == filetype
