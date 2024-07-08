@@ -627,7 +627,7 @@ func! AutoPairsTryInit()
         let old_cr = '<CR>'
         let is_expr = 0
       else
-        let old_cr = info['rhs']
+        let old_cr = '<CR>'
         let old_cr = s:ExpandMap(old_cr)
         let old_cr = substitute(old_cr, '<SID>', '<SNR>' . info['sid'] . '_', 'g')
         let is_expr = info['expr']
